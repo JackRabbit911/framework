@@ -35,7 +35,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Sys\\": "vendor/alpha-zeta/framework/src/"
+            "Sys\\": "src/"
         }
     },
     "require-dev": {
@@ -46,7 +46,7 @@
     },
     "autoload-dev": {
         "psr-4": { 
-            "Tests\\Sys\\": "vendor/alpha-zeta/framework/tests/"
+            "Tests\\Sys\\": "tests/"
         }
     }
 }

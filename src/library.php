@@ -123,8 +123,16 @@ function getMode(?string $path = null)
 
 function __(string $string, ?array $values = null): string
 {
-    $i18n = container()->get(I18n::class);
-    return $i18n->gettext($string, $values);
+    if (container()->has(I18n::class)) {
+        try {
+            $i18n = container()->get(I18n::class);
+            return $i18n->gettext($string, $values);
+        } catch (Exception $e) {
+            return ($values) ? strtr($string, $values) : $string;
+        }
+    }
+
+    return ($values) ? strtr($string, $values) : $string;
 }
 
 function path($routeName, $params = [])

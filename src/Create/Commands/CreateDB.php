@@ -19,15 +19,18 @@ final class CreateDB extends Command
     {
         $connect = config('database', 'connect.mysql');
 
-        $data = [
+        $args = [
             'host' => $connect['host'],
             'root_password' => $connect['root_password'],
+        ];
+
+        $data = [
             'dbname' => (empty($dbname)) ? $connect['database'] : $dbname,
             'password' => (empty($password)) ? $connect['password'] : $password,
             'username' => (empty($username)) ? $connect['username'] : $username,
         ];
 
-        $call = new CallApi(ModelCreateDB::class, 'create');
+        $call = new CallApi(ModelCreateDB::class, 'create', $args);
         $res = $call->execute($data);
 
         if ($res) {

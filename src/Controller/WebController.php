@@ -26,11 +26,30 @@ abstract class WebController extends BaseController
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $this->tpl = container()->get(Template::class);
+        $this->app = container()->get(App::class);
+
+        $i18n = $request->getAttribute('i18n');
+
+        if (isset($i18n)) {
+            $this->tpl->addGlobal('lang', $i18n->lang());
+        }
+
+        $this->tpl->addFunction('__', function ($string, $values = null) use ($i18n) {
+            if (isset($i18n)) {
+                return $i18n->gettext($string, $values);
+            } else {
+                return ($values) ? strtr($string, $values) : $string;
+            }
+        });
+
+        $this->app->add('user', $request->getAttribute('user'));
+        $this->app->add('session', $request->getAttribute('session'));
+
+        $this->tpl->addGlobal('app', $this->app);
+
         $this->session = $request->getAttribute('session');
-        $this->tpl = $request->getAttribute('tpl');
         $this->user = $request->getAttribute('user');
-        $this->i18n = $request->getAttribute('i18n');
-        $this->app = $request->getAttribute('app');
 
         return parent::process($request, $handler);
     }

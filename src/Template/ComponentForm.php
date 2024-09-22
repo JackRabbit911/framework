@@ -65,7 +65,7 @@ trait ComponentForm
             } elseif ($attribute['type'] === 'checkbox' && !empty($validationResponse['value'])) {
                 if ((is_array($validationResponse['value']) 
                     && in_array($attribute['value'], $validationResponse['value'])) 
-                    || ($attribute['value'] == $validationResponse['value'])) {
+                    || $this->isTrue($validationResponse['value'])) {
                     $attribute['checked'] = true;
                 } else {
                     $attribute['checked'] = false;

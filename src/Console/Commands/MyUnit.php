@@ -9,7 +9,7 @@ final class MyUnit extends Command
     private string $unitPath = 'vendor/bin/phpunit';
 
     private array $commands = [
-        'sys' => SYSPATH. 'vendor/az/',
+        'sys' => SYSPATH. 'vendor/alpha-zeta/',
         'app' => APPPATH . 'tests',
     ];
 

@@ -11,6 +11,11 @@ final class ShowTasks extends Command
     public function execute()
     {
         $data = (new CallApi(ModelTask::class, 'get'))->execute();
-        $this->climate->table($data);
+        
+        if (empty($data)) {
+            $this->climate->out('Tasks list is empty');
+        } else {
+            $this->climate->table($data);
+        }
     }
 }

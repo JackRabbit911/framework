@@ -55,6 +55,11 @@ class App
             ->enable(false)
             ->get('commands', $command);
 
+        if (!$class) {
+            echo "Command '$this->command' not recognized". PHP_EOL;
+            exit;
+        }
+
         return container()->get($class);
     }
 }

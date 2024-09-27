@@ -28,15 +28,15 @@ final class Files
             }
 
             $info = pathinfo($file);
-            $filesname = $info['filename'];
+            $filename = $info['filename'];
             $dir = $info['dirname'];
 
-            if (!is_dir($dir)) {
-                mkdir($dir, 0775, true);
+            if (!is_dir(APPPATH . $dir)) {
+                mkdir(APPPATH . $dir, 0775, true);
             }
     
-            if (!is_writable($dir)) {
-                chmod($dir, 0775);
+            if (!is_writable(APPPATH . $dir)) {
+                chmod(APPPATH . $dir, 0775);
             }
     
             if (!is_dir($dir) || !is_writable($dir)) {
@@ -44,7 +44,7 @@ final class Files
                 return false;
             }
 
-            $data = $this->getData($dir, $filesname, $paths['model']);
+            $data = $this->getData($dir, $filename, $paths['model']);
             $content = render($this->getBlank($type), $data);
 
             $res = file_put_contents(APPPATH . $file, $content);

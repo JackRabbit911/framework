@@ -7,11 +7,11 @@ trait Ftp
     public function ftpConnect(): \FTP\Connection
     {
         $ftp = ftp_connect(env('FTP_HOST'));
-        $login_result = ftp_login($ftp, env('FTP_USER'), env('FTP_PASSWORD'));
 
-        if (!$login_result) {
-            die('Failed to establish connection to ftp server: ' . env('FTP_HOST') . PHP_EOL);
-        }
+        ftp_login($ftp, env('FTP_USER'), env('FTP_PASSWORD')) or 
+        die('Failed to establish connection to ftp server: ' . env('FTP_HOST') . PHP_EOL);
+
+        ftp_pasv($ftp, true);
 
         return $ftp;
     }
@@ -26,6 +26,6 @@ trait Ftp
             $contents[$dir] = ftp_nlist($ftp, $dir);
         }
 
-        return in_array($remote_file, $contents[$dir]);
+        return (!$contents[$dir]) ?: in_array($remote_file, $contents[$dir]);
     }
 }

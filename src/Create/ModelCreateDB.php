@@ -22,7 +22,7 @@ final class ModelCreateDB
         $dbs = $sth->fetchAll(PDO::FETCH_COLUMN);
         
         if (empty($dbs)) {
-            $sql = "CREATE DATABASE `$dbname` COLLATE 'utf8mb4_general_ci';
+            $sql = "CREATE DATABASE IF NOT EXISTS `$dbname` COLLATE 'utf8mb4_general_ci';
             CREATE USER IF NOT EXISTS '$username'@'%' IDENTIFIED BY '$password';
             GRANT ALL PRIVILEGES ON $dbname.* TO '$username'@'%';
             FLUSH PRIVILEGES;";

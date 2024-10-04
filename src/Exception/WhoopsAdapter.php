@@ -120,7 +120,7 @@ final class WhoopsAdapter implements SetErrorHandlerInterface
     private function setEditor(PrettyPageHandler $handler)
     {
         $handler->setEditor(function ($file, $line) {
-            $file = str_replace(env('IDE_SEARCH'), env('IDE_REPLACE'), $file);
+            $file = str_replace(env('IDE_SEARCH', ''), env('IDE_REPLACE', ''), $file);
             return $file . ':' . $line;
         });
     }

@@ -5,7 +5,7 @@ namespace Sys\Console\Commands;
 final class ShowLog extends LogAbstract
 {
     protected function all()
-    {
+    {        
         foreach (glob($this->path . '*.log') as $file) {
             $filename = pathinfo($file, PATHINFO_BASENAME);
             $lines = $this->countLines($file);
@@ -13,7 +13,11 @@ final class ShowLog extends LogAbstract
             $data[] = ['File' => $filename, 'Lines' => $lines];
         }
 
-        $this->climate->table($data);
+        if (!empty($data)) {
+            $this->climate->table($data);
+        } else {
+            $this->climate->out('No logfiles');
+        }
     }
 
     protected function file($file, $lines)

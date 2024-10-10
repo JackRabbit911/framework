@@ -19,6 +19,11 @@ class App
         $this->objects[$key] = $obj;
     }
 
+    public function isset($key)
+    {
+        return isset($this->objects[$key]);
+    }
+
     public function cmp($class, array $attributes = [])
     {
         if (class_exists($class)) {

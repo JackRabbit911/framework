@@ -4,6 +4,7 @@ namespace Sys\Collection;
 
 use ArrayAccess;
 use ArrayIterator;
+use Exception;
 use IteratorAggregate;
 use IteratorIterator;
 use Traversable;
@@ -77,6 +78,60 @@ class Collection implements ArrayAccess, IteratorAggregate
     {
         $array = array_filter($this->items, $callback);
         return new static($array);
+    }
+
+    public function where($name, $op, $value)
+    {
+        $cmp = function ($v) use ($name, $op, $value) {
+            $res = null;
+            $prop = $v->$name;
+            eval("\$res = $prop $op $value;");
+            return $res;
+        };
+
+        $array = array_filter($this->items, $cmp);
+        return new static($array);
+    }
+
+    public function first()
+    {
+        $key = array_key_first($this->items);
+        return $this->items[$key];
+    }
+
+    public function last()
+    {
+        $key = array_key_last($this->items);
+        return $this->items[$key];
+    }
+
+    public function count()
+    {
+        return count($this->items);
+    }
+
+    public function orderBy($name, $order = 'ASC')
+    {
+        $cmp = function ($a, $b) use ($name, $order) {
+            return (strtolower($order) === 'asc') 
+            ? $a->$name <=> $b->$name : $b->$name <=> $a->$name;
+        };
+
+        $array = $this->items;
+        usort($array, $cmp);
+        return new static($array);
+    }
+
+    public function usort($callback)
+    {
+        $array = $this->items;
+        usort($array, $callback);
+        return new static($array);
+    }
+
+    public function in($value)
+    {
+        return in_array($value, $this->items);
     }
 
     public function join($name, $glue = ' ', $finalGlue = '')

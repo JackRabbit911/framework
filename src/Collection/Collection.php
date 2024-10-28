@@ -4,12 +4,13 @@ namespace Sys\Collection;
 
 use ArrayAccess;
 use ArrayIterator;
+use Countable;
 use Exception;
 use IteratorAggregate;
 use IteratorIterator;
 use Traversable;
 
-class Collection implements ArrayAccess, IteratorAggregate
+class Collection implements ArrayAccess, IteratorAggregate, Countable
 {
     private array $items = [];
 
@@ -96,16 +97,16 @@ class Collection implements ArrayAccess, IteratorAggregate
     public function first()
     {
         $key = array_key_first($this->items);
-        return $this->items[$key];
+        return $this->items[$key] ?? null;
     }
 
     public function last()
     {
         $key = array_key_last($this->items);
-        return $this->items[$key];
+        return $this->items[$key] ?? null;
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->items);
     }

@@ -81,6 +81,39 @@ class Collection implements ArrayAccess, IteratorAggregate, Countable
         return new static($array);
     }
 
+    public function replace($replace)
+    {
+        if ($replace instanceof Collection) {
+            $replace = $replace->all();
+        }
+
+        $array = array_replace($replace, $this->items);
+
+        return new static($array);
+    }
+
+    public function merge($merge)
+    {
+        if ($merge instanceof Collection) {
+            $merge = $merge->all();
+        }
+
+        $array = array_merge($merge, $this->items);
+
+        return new static($array);
+    }
+
+    public function getInstance($value, $name = 'id')
+    {
+        return array_reduce($this->items, function ($carry, $item) use ($name, $value) {
+            if ($item->$name == $value) {
+                $carry = $item;
+            }
+
+            return $carry;
+        });
+    }
+
     public function where($name, $op, $value)
     {
         $cmp = function ($v) use ($name, $op, $value) {

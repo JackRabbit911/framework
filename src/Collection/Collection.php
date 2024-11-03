@@ -3,11 +3,8 @@
 namespace Sys\Collection;
 
 use ArrayAccess;
-use ArrayIterator;
 use Countable;
-use Exception;
 use IteratorAggregate;
-use IteratorIterator;
 use Traversable;
 
 class Collection implements ArrayAccess, IteratorAggregate, Countable
@@ -78,6 +75,12 @@ class Collection implements ArrayAccess, IteratorAggregate, Countable
     public function filter($callback)
     {
         $array = array_filter($this->items, $callback);
+        return new static($array);
+    }
+
+    public function map($callback)
+    {
+        $array = array_map($callback, $this->items);
         return new static($array);
     }
 

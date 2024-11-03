@@ -87,8 +87,7 @@ class Collection implements ArrayAccess, IteratorAggregate, Countable
             $replace = $replace->all();
         }
 
-        $array = array_replace($replace, $this->items);
-
+        $array = array_replace($this->items, $replace);
         return new static($array);
     }
 
@@ -98,8 +97,7 @@ class Collection implements ArrayAccess, IteratorAggregate, Countable
             $merge = $merge->all();
         }
 
-        $array = array_merge($merge, $this->items);
-
+        $array = array_merge($this->items, $merge);
         return new static($array);
     }
 

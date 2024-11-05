@@ -39,9 +39,9 @@ final class Files
                 chmod(APPPATH . $dir, 0775);
             }
     
-            if (!is_dir($dir) || !is_writable($dir)) {
+            if (!is_dir(APPPATH . $dir) || !is_writable(APPPATH . $dir)) {
                 $errors[] = $dir;
-                return false;
+                continue;
             }
 
             $data = $this->getData($dir, $filename, $paths['model']);

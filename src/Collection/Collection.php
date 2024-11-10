@@ -46,6 +46,11 @@ class Collection implements ArrayAccess, IteratorAggregate, Countable
         return $this->items;
     }
 
+    public function ids()
+    {
+        return $this->_props('id');
+    }
+
     public function props($name = 'id')
     {
         $array = $this->_props($name);
@@ -195,7 +200,7 @@ class Collection implements ArrayAccess, IteratorAggregate, Countable
     private function _props($name)
     {
         return array_map(function ($v) use ($name) {
-            return $v->$name;
+            return $v->$name ?? null;
         }, $this->items);
     }
 }

@@ -197,6 +197,11 @@ class Collection implements ArrayAccess, IteratorAggregate, Countable
         return implode($glue, $array) . $finalGlue . $finalItem;
     }
 
+    public function empty()
+    {
+        return empty($this->items);
+    }
+
     private function _props($name)
     {
         return array_map(function ($v) use ($name) {

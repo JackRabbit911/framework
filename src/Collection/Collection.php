@@ -120,6 +120,12 @@ class Collection implements ArrayAccess, IteratorAggregate, Countable
         });
     }
 
+    public function reduce($callback)
+    {
+        return array_reduce($this->items, $callback);
+    }
+
+
     public function where($name, $op, $value)
     {
         $cmp = function ($v) use ($name, $op, $value) {

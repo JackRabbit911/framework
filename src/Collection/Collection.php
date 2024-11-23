@@ -208,6 +208,25 @@ class Collection implements ArrayAccess, IteratorAggregate, Countable
         return empty($this->items);
     }
 
+    public function intersect($array)
+    {
+        if ($array instanceof Collection) {
+            $ids = $array->ids();
+        } else {
+            $ids = array_map(function ($v) {
+                return $v->id;
+            }, $array);
+        }
+
+        $intersect = array_intersect($this->ids(), $ids);
+
+        foreach ($intersect as $key => $value) {
+            $result[] = $this->items[$key]; 
+        }
+
+        return new static($result ?? []);
+    }
+
     private function _props($name)
     {
         return array_map(function ($v) use ($name) {

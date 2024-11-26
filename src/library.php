@@ -43,6 +43,10 @@ function env(string $key, $default = null)
         $entry = $default;
     }
 
+    if (ctype_digit($entry)) {
+        $entry = (int) $entry;
+    }
+
     $entry = match ($entry) {
         'on', 'yes', 'true' => true,
         'no', 'off', 'false' => false,

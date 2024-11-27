@@ -43,13 +43,13 @@ abstract class WebController extends BaseController
             }
         });
 
-        $this->app->add('user', $request->getAttribute('user'));
-        $this->app->add('session', $request->getAttribute('session'));
-
-        $this->tpl->addGlobal('app', $this->app);
-
         $this->session = $request->getAttribute('session');
         $this->user = $request->getAttribute('user');
+
+        $this->app->add('user', $this->user);
+        $this->app->add('session', $this->session);
+
+        $this->tpl->addGlobal('app', $this->app);
 
         return parent::process($request, $handler);
     }

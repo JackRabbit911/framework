@@ -180,6 +180,23 @@ class Collection implements ArrayAccess, IteratorAggregate, Countable
         return in_array($value, $this->items);
     }
 
+    public function has($value, $name = 'id')
+    {
+        foreach ($this->items as $item) {
+            if ($item->$name == $value) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function push($value)
+    {
+        array_push($this->items, $value);
+        return new static($this->items);
+    }
+
     public function join($name, $glue = ' ', $finalGlue = '')
     {
         $array = $this->_props($name);

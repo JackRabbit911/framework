@@ -43,7 +43,7 @@ function env(string $key, $default = null)
         $entry = $default;
     }
 
-    if (ctype_digit($entry)) {
+    if ($entry && ctype_digit($entry)) {
         $entry = (int) $entry;
     }
 

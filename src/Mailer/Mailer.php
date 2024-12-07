@@ -2,40 +2,24 @@
 
 namespace Sys\Mailer;
 
-use Error;
 use PHPMailer\PHPMailer\PHPMailer;
-use Sys\Trait\Options;
+use PHPMailer\PHPMailer\SMTP;
 
 class Mailer
 {
-    use Options;
-
     public PHPMailer $mailer;
-    private $default_charset = 'utf-8';
-    private $is_smtp = true;
-    private $is_imap = false;
-    private $smtp;
-    private $smtp_port;
-    private $smtp_auth = true;
-    private $smtp_secure = 'tls';
-    // private $pop3;
-    // private $pop3_box;
-    // private $imap;
-    // private $imapbox;
-    private $mailboxes = [];
-    private $is_html = true;
 
     public function __construct()
     {
         $settings = config('mail/mail');
-        $this->is_smtp = $settings['is_smtp'];
-        $debug = (IS_DEBUG) ? true : null;
-        $debug = true;
 
-        $this->mailer = new PHPMailer($debug);
-        $this->mailer->CharSet = $this->default_charset;
+        $this->mailer = new PHPMailer(true);
 
-        if($this->is_smtp)
+        $this->mailer->CharSet = PHPMailer::CHARSET_UTF8;
+        $this->mailer->isHTML(true);
+        // $this->mailer->SMTPDebug = SMTP::DEBUG_SERVER;
+        
+        if($settings['is_smtp'])
         {
             $this->mailer->isSMTP();
             $this->mailer->Host = $settings['smtp'];
@@ -43,52 +27,84 @@ class Mailer
 
             if ($settings['smtp_auth']) {
                 $this->mailer->SMTPAuth = true;
-                $this->mailer->Username = $settings['from_address'];
-                $this->mailer->Password = $settings['password'];
-                $this->mailer->SMTPSecure = $this->smtp_secure;
-            }            
-        }
-
-        $this->mailer->isHTML($this->is_html);
-        $this->mailer->setFrom($settings['from_address'], $settings['from_name']);
-    }
-
-    public function send(Mail $mail)
-    {
-        $this->mailer->clearAttachments();
-        $this->mailer->clearAllRecipients();
-
-        $mail->setData();
-        $mail->render();
-
-        foreach ($mail as $key => $value) {
-            if (property_exists($this->mailer, $key)) {
-                $this->mailer->$key = (is_array($value)) ? $value[0] : $value;
-            } elseif (method_exists($this->mailer, $key)) {
-                if ($key == 'addAddress') {
-                    foreach ($value as $val) {
-                        $this->mailer->addAddress($val[0], $val[1] ?? '');
-                    }
-                } else {
-                    call_user_func_array([$this->mailer, $key], $value);
-                }
-            } else {
-                $ukey = ucfirst($key);
-                if (property_exists($this->mailer, $ukey)) {
-                    $this->mailer->$ukey = (is_array($value)) ? $value[0] : $value;
-                } elseif (method_exists($this->mailer, $ukey)) {
-                    call_user_func_array([$this->mailer, $ukey], $value);
-                } else {
-                    throw new Error("Call to undefined method PHPMailer::$key");
-                }
+                $this->mailer->SMTPSecure = $settings['smtp_secure'];
             }
         }
-        
+    }
+
+    public function isQueue()
+    {
+        return $settings['is_queue'] ?? false;
+    }
+
+    public function html(bool $is_html)
+    {
+        $this->mailer->isHTML($is_html);
+        return $this;
+    }
+
+    public function mailbox($username, $password)
+    {
+        if ($this->mailer->SMTPAuth === true) {
+            $this->mailer->Username = $username;
+            $this->mailer->Password = $password;
+        }
+    }
+
+    public function from($address, $name = '')
+    {
+        $this->mailer->setFrom($address, $name);
+        return $this;
+    }
+
+    public function address($address, $name = '')
+    {
+        $this->mailer->addAddress($address, $name);
+        return $this;
+    }
+
+    public function subject($subject)
+    {
+        $this->mailer->Subject = $subject;
+        return $this;
+    }
+
+    public function body($body)
+    {
+        $this->mailer->Body = $body;
+        return $this;
+    }
+
+    public function altBody($string = '')
+    {
+        $this->mailer->AltBody = $string;
+        return $this;
+    }
+
+    public function cc($address, $name = '')
+    {
+        $this->mailer->addCC($address, $name);
+        return $this;
+    }
+
+    public function bcc($address, $name = '')
+    {
+        $this->mailer->addBCC($address, $name);
+        return $this;
+    }
+
+    public function attach($path)
+    {
+        $this->mailer->addAttachment($path);
+        return $this;
+    }
+
+    public function send(?Mail $mail = null)
+    {
         if(!$this->mailer->send()) {
             $response = [
                 'status' => false,
                 'message' => $this->mailer->ErrorInfo,
-                'context' => $mail->addAddress,
             ];
         } else {
             $response = [
@@ -96,6 +112,9 @@ class Mailer
                 'message' => 'success',
             ];
         }
+
+        $this->mailer->clearAttachments();
+        $this->mailer->clearAllRecipients();
 
         return $response;
     }

@@ -15,5 +15,13 @@ final class Queue extends Entity
     const ERROR = 4;
 
     protected string $name;
+    protected string $job;
     protected string $data;
+
+    public function __construct($data)
+    {
+        $this->name = $data['name'];
+        $this->job = $data['job'];
+        $this->data = $data['data'];
+    }
 }

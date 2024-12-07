@@ -32,6 +32,11 @@ class Mailer
         }
     }
 
+    public function isQueue()
+    {
+        return $settings['is_queue'] ?? false;
+    }
+
     public function html(bool $is_html)
     {
         $this->mailer->isHTML($is_html);
@@ -79,11 +84,19 @@ class Mailer
     public function cc($address, $name = '')
     {
         $this->mailer->addCC($address, $name);
+        return $this;
     }
 
     public function bcc($address, $name = '')
     {
         $this->mailer->addBCC($address, $name);
+        return $this;
+    }
+
+    public function attach($path)
+    {
+        $this->mailer->addAttachment($path);
+        return $this;
     }
 
     public function send(?Mail $mail = null)

@@ -66,8 +66,8 @@ class Mailer
     public function address($address, $name = '')
     {
         if (is_array($address)) {
-            $address = $address[0];
             $name = $address[1] ?? '';
+            $address = $address[0];
         }
 
         $this->mailer->addAddress($address, $name);

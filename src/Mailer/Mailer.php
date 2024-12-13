@@ -66,7 +66,7 @@ class Mailer
         }
 
         $this->mailer->addAddress($address, $name);
-        $this->toNames[$name];
+        $this->toNames[] = $name;
         return $this;
     }
 

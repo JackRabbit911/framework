@@ -33,6 +33,11 @@ class Mailer
         }
     }
 
+    public function getToNames()
+    {
+        return implode(', ', $this->toNames);
+    }
+
     public function isQueue()
     {
         return $settings['is_queue'] ?? false;

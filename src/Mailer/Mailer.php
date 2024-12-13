@@ -8,6 +8,7 @@ use PHPMailer\PHPMailer\SMTP;
 class Mailer
 {
     public PHPMailer $mailer;
+    private array $toNames = [];
 
     public function __construct()
     {
@@ -59,7 +60,13 @@ class Mailer
 
     public function address($address, $name = '')
     {
+        if (is_array($address)) {
+            $address = $address[0];
+            $name = $address[1] ?? '';
+        }
+
         $this->mailer->addAddress($address, $name);
+        $this->toNames[$name];
         return $this;
     }
 

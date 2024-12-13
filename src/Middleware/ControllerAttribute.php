@@ -18,6 +18,7 @@ use Sys\Observer\Interface\Listener;
 use Sys\Observer\Interface\Observer;
 use Sys\PostProcess;
 use TypeError;
+use Error;
 
 final class ControllerAttribute implements MiddlewareInterface
 {
@@ -60,10 +61,10 @@ final class ControllerAttribute implements MiddlewareInterface
             }
 
             try {
-                $instance = $attr->newInstance();
+                $instance = $attr->newInstance();              
             } catch (TypeError $e) {
                 $args = $attr->getArguments();
-                $args['subject'] = $controller ?? $routeHandler;
+                $args['_class'] = $controller ?? $routeHandler;
                 $instance = $this->container->make($attr->getName(), $args);
             }
 

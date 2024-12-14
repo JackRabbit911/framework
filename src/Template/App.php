@@ -31,8 +31,9 @@ class App
         }
 
         $class = ucfirst($class);
+        $files = array_merge(glob(APPPATH . '*/*/Component/*.php'), glob(APPPATH . '*/Component/*.php'));
 
-        foreach(glob(APPPATH . '**/Component/*.php') as $file) {
+        foreach($files as $file) {
             if ($class === pathinfo($file, PATHINFO_FILENAME)) {
                 $file = str_replace(APPPATH, '', $file);
                 $arr_file = array_map(function ($f) {

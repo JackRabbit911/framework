@@ -3,14 +3,11 @@
 namespace Sys;
 
 // use Sys\Profiler\Profiler;
-use Az\Route\RouteCollectionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use HttpSoft\Runner\MiddlewarePipelineInterface;
 use HttpSoft\Runner\MiddlewareResolverInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-// use Psr\Http\Message\ResponseInterface;
 use HttpSoft\Emitter\EmitterInterface;
-// use Sys\Config\Config;
 use Sys\Exception\SetErrorHandlerInterface;
 
 final class App
@@ -18,7 +15,6 @@ final class App
     private const NO_BODY_RESPONSE_CODES = [100, 101, 102, 204, 205, 304];
 
     private ServerRequestInterface $request;
-    private RouteCollectionInterface $route;
     private MiddlewarePipelineInterface $pipeline;
     private MiddlewareResolverInterface $resolver;
     private RequestHandlerInterface $defaultHandler;
@@ -27,7 +23,6 @@ final class App
 
     public function __construct(
         ServerRequestInterface $request,
-        RouteCollectionInterface $route,
         MiddlewarePipelineInterface $pipeline,
         MiddlewareResolverInterface $resolver,    
         EmitterInterface $emitter,
@@ -37,7 +32,6 @@ final class App
     )
     {
         $this->request = $request;
-        $this->route = $route;
         $this->pipeline = $pipeline;
         $this->resolver = $resolver;
         $this->emitter = $emitter;
@@ -62,16 +56,6 @@ final class App
 
         $file = CONFIG . "pipeline/common.php";
         if ($file && is_file($file)) {
-            require_once $file;
-        }
-
-        $file = CONFIG . "routes/common.php";
-        if ($file && is_file($file)) {
-            require_once $file;
-        }
-
-        $file = CONFIG . "routes/$mode.php";
-        if (is_file($file)) {
             require_once $file;
         }
 

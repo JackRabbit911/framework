@@ -11,7 +11,7 @@ use Sys\Helper\ResponseType;
 
 final class ExceptionResponseFactory implements HttpExceptionInterface
 {
-    private $view = SYSPATH . FRAMEWORK . 'Exception/views/http.php';
+    private $view = FRAMEWORK . 'Exception/views/http.php';
 
     public function createResponse(ResponseType $responseType, int $code = 200, string $reasonPhrase = ''): ResponseInterface
     {

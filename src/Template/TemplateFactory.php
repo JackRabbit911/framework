@@ -10,10 +10,10 @@ class TemplateFactory
 {
     public function create($config = null): Template
     {
-        $viewPath = $config['view_path'] ?? APPPATH . 'app/views';
+        $viewPath = $config['view_path'] ?? 'app/views';
         $options = $config['options'] ?? [];
 
-        $loader = new FilesystemLoader($viewPath);
+        $loader = new FilesystemLoader($viewPath, APPPATH);
         $twig = new Environment($loader, $options);
 
         if (ENV > PRODUCTION) {

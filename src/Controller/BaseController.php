@@ -2,7 +2,7 @@
 
 namespace Sys\Controller;
 
-use Az\Route\NormalizeResponse;
+use Sys\Trait\NormalizeResponse;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;

@@ -9,17 +9,9 @@ trait InvokeTrait
         $container = container();
 
         if ($container && method_exists($container, 'call')) {
-            $result = $container->call([$this, $action], $attr);
-        } else {
-            $args = [];
-            $reflect = new \ReflectionMethod($this, $action);
-            foreach ($reflect->getParameters() as $param) {
-                $name = $param->getName();
-                $args[$name] = $attr[$name] ?? $param->getDefaultValue() ?? null;
-            }
-            $result = $reflect->invokeArgs($this, $args);
+            return $container->call([$this, $action], $attr);
         }
-
-        return $result;
+            
+        return call_user_func_array([$this, $action], $attr);
     }
 }

@@ -36,7 +36,7 @@ class MimeNegotiator
         return 'html';
     }
 
-    private function getSortedMimeTypesByHeader(): array
+    public function getSortedMimeTypesByHeader(): array
     {
         if (!$this->acceptHeader) {
             return [];

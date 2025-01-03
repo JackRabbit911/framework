@@ -20,13 +20,17 @@ trait NormalizeResponse
         
         $accept_header = $request->getHeaderLine('Accept');
         $mimeNegotiator = new MimeNegotiator($accept_header);
-        $response_type = $mimeNegotiator->getResponseType();
+        $mimeTypes = $mimeNegotiator->getSortedMimeTypesByHeader($accept_header);
 
-        return match ($response_type) {
-            'xml' => new XmlResponse($response),
-            'text' => new TextResponse($response),
-            'json' => new JsonResponse($response),
-            default => new HtmlResponse($response),
-        };
+        foreach ($mimeTypes as $mimeType) {
+            return match ($mimeType) {
+                'text/html', '*/*' => new HtmlResponse($response),
+                'text/plain' => new TextResponse($response),
+                'application/json' => new JsonResponse($response),
+                'application/xml', 'text/xml' => new XmlResponse($response),
+            };
+        }
+
+        return new HtmlResponse($response);
     }
 }

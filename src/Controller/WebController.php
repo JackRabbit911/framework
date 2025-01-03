@@ -10,7 +10,6 @@ use HttpSoft\Response\TextResponse;
 use HttpSoft\Response\XmlResponse;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 use Sys\FileResponse;
 use Sys\I18n\I18n;
 use Sys\Template\Template;
@@ -24,7 +23,7 @@ abstract class WebController extends BaseController
     protected ?I18n $i18n;
     protected App $app;
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $this->tpl = container()->get(Template::class);
         $this->app = container()->get(App::class);
@@ -48,10 +47,9 @@ abstract class WebController extends BaseController
 
         $this->app->add('user', $this->user);
         $this->app->add('session', $this->session);
-
         $this->tpl->addGlobal('app', $this->app);
 
-        return parent::process($request, $handler);
+        return parent::handle($request);
     }
 
     protected function text(string $string): ResponseInterface

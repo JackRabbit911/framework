@@ -3,30 +3,26 @@
 namespace Sys\Controller;
 
 use Sys\Trait\NormalizeResponse;
-use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Az\Route\Route;
 
-abstract class BaseController implements MiddlewareInterface
+abstract class BaseController implements RequestHandlerInterface
 {
     use InvokeTrait;
     use NormalizeResponse;
 
     protected ServerRequestInterface $request;
     protected array $parameters;
-    private string $action;
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $this->request = $request;
         $route = $request->getAttribute(Route::class);
         $this->parameters = $route->getParameters();
 
-        $action = $route->getHandler()[1] 
-        ?? $request->getAttribute('action') 
-        ?? $this->parameters['action'] ?? '__invoke';
+        [$handler, $action] = $route->getHandler();
 
         $this->_before();
         $response = $this->call($action, $this->parameters);
@@ -34,29 +30,6 @@ abstract class BaseController implements MiddlewareInterface
         $this->_after($response);
         return $response;
     }
-
-    // protected function addQuery($param, $uri = null)
-    // {
-    //     if ($uri) {
-    //         $path = parse_url($uri, PHP_URL_PATH);
-    //         $query = parse_url($uri, PHP_URL_QUERY) ?? '';
-    //     } else {
-    //         $uri = $this->request->getUri();
-    //         $path = $uri->getPath();
-    //         $query = $uri->getQuery() ?? '';
-    //     }
-
-    //     parse_str($query, $r1);
-
-    //     if (is_string($param)) {
-    //         parse_str($param, $param);
-    //     }
-
-    //     $result = array_merge($r1, $param);
-    //     $query_str = http_build_query($result);
-
-    //     return (!empty($query_str)) ? $path . '?' . $query_str : $path;
-    // }
 
     protected function _before() {}
 

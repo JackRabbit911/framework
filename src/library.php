@@ -3,7 +3,7 @@
 use Sys\I18n\I18n;
 // use Az\Session\Session;
 use Az\Validation\Csrf;
-use Az\Route\RouteCollectionInterface;
+use Az\Route\RouterInterface;
 use Az\Session\SessionInterface;
 use Dotenv\Dotenv;
 use Psr\Http\Message\ServerRequestInterface;
@@ -142,7 +142,7 @@ function __(string $string, ?array $values = null): string
 function path($routeName, $params = [])
 {
     $container = container();
-    $routeCollection = $container->get(RouteCollectionInterface::class);
+    $routeCollection = $container->get(RouterInterface::class);
     $route = $routeCollection->getRoute($routeName);
 
     if (!array_key_exists('lang', $params) && $container->has(I18n::class)) {

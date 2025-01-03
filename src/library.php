@@ -150,7 +150,9 @@ function path($routeName, $params = [])
         $params['lang'] = rtrim($i18n->langSegment(), '/');
     }
 
-    return $route->path($params);
+    $uriPrefix = $GLOBALS['URI_PREFIX'] ?? '/';
+
+    return $uriPrefix . trim($route->path($params), '/');
 }
 
 function url($routeName = null, $params = [])

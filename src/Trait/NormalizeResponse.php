@@ -2,7 +2,7 @@
 
 namespace Sys\Trait;
 
-use Az\Route\MimeNegotiator;
+use Sys\Helper\MimeNegotiator;
 use HttpSoft\Response\HtmlResponse;
 use HttpSoft\Response\JsonResponse;
 use HttpSoft\Response\TextResponse;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Sys\Exception;
+namespace Sys\Helper;
 
 class MimeNegotiator
 {

@@ -6,7 +6,7 @@ use Sys\Exception\ExceptionResponseFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Sys\Exception\MimeNegotiator;
+use Sys\Helper\MimeNegotiator;
 use Sys\Helper\ResponseType;
 
 class DefaultHandler implements RequestHandlerInterface

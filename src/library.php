@@ -14,7 +14,7 @@ use Sys\SimpleRequest;
 use Sys\Template\Template;
 use HttpSoft\Emitter\SapiEmitter;
 use Sys\Exception\ExceptionResponseFactory;
-use Sys\Exception\MimeNegotiator;
+use Sys\Helper\MimeNegotiator;
 use Sys\Helper\ResponseType;
 
 function dd(...$values)

@@ -7,6 +7,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Whoops\Run as Whoops;
 use Whoops\Handler\PrettyPageHandler;
+use Sys\Helper\MimeNegotiator;
 use Sys\Helper\ResponseType;
 use Sys\Exception\ExceptionResponseFactory;
 

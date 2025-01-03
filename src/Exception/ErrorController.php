@@ -4,6 +4,7 @@ namespace Sys\Exception;
 
 use Az\Route\Route;
 use Sys\Exception\ExceptionResponseFactory;
+use Sys\Helper\MimeNegotiator;
 use Sys\Helper\ResponseType;
 
 final class ErrorController

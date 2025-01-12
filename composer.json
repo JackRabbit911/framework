@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "alpha-zeta/route": "^1.0",
+        "alpha-zeta/simple-route": "^1.0",
         "alpha-zeta/session": "^1.0",
         "alpha-zeta/validation": "^1.0",
         "php-di/php-di": "^7.0",

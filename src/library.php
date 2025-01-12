@@ -142,8 +142,7 @@ function __(string $string, ?array $values = null): string
 function path($routeName, $params = [])
 {
     $container = container();
-    $routeCollection = $container->get(RouterInterface::class);
-    $route = $routeCollection->getRoute($routeName);
+    $router = $container->get(RouterInterface::class);
 
     if (!array_key_exists('lang', $params) && $container->has(I18n::class)) {
         $i18n = $container->get(I18n::class);
@@ -152,7 +151,7 @@ function path($routeName, $params = [])
 
     $uriPrefix = $GLOBALS['URI_PREFIX'] ?? '/';
 
-    return $uriPrefix . trim($route->path($params), '/');
+    return $uriPrefix . trim($router->path($routeName, $params), '/');
 }
 
 function url($routeName = null, $params = [])

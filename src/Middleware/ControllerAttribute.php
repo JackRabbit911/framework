@@ -10,7 +10,6 @@ use Az\Route\Route;
 use HttpSoft\Runner\MiddlewarePipeline;
 use HttpSoft\Runner\MiddlewarePipelineInterface;
 use Psr\Container\ContainerInterface;
-use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionFunction;
 use ReflectionMethod;
@@ -18,7 +17,6 @@ use Sys\Observer\Interface\Listener;
 use Sys\Observer\Interface\Observer;
 use Sys\PostProcess;
 use TypeError;
-use Error;
 
 final class ControllerAttribute implements MiddlewareInterface
 {
@@ -36,24 +34,9 @@ final class ControllerAttribute implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $route = $request->getAttribute(Route::class);
-
-        if (!$route) {
-            return $handler->handle($request);
-        }
-
         $routeHandler = $route->getHandler();
-
-        if (is_array($routeHandler)) {
-            [$controller, $method] = $routeHandler;
-            $rc = new ReflectionClass($controller);
-            $rm = $request->getAttribute('reflection_method') ?? new ReflectionMethod($controller, $method);
-
-            $attributes = array_merge($rc->getAttributes(), $rm->getAttributes());
-           
-        } elseif (is_callable($routeHandler)) {
-            $rf = new ReflectionFunction($routeHandler);
-            $attributes = $rf->getAttributes();
-        }
+        $reflect = $request->getAttribute('reflect') ?? $this->getReflect($routeHandler);
+        $attributes = $this->getAttributes($reflect);
 
         foreach ($attributes as $attr) {
             if (is_a($attr->getName(), Route::class, true)) {
@@ -64,11 +47,11 @@ final class ControllerAttribute implements MiddlewareInterface
                 $instance = $attr->newInstance();              
             } catch (TypeError $e) {
                 $args = $attr->getArguments();
-                $args['_class'] = $controller ?? $routeHandler;
+                $args['_class'] = $routeHandler[0] ?? $routeHandler;
                 $instance = $this->container->make($attr->getName(), $args);
             }
 
-            $this->do($instance, $controller ?? $routeHandler);
+            $this->do($instance, $routeHandler[0] ?? $routeHandler);
         }
         
         return $this->pipeline->process($request, $handler);
@@ -81,5 +64,27 @@ final class ControllerAttribute implements MiddlewareInterface
             ($instance instanceof Observer) => $this->postProcess->enqueue($instance->update($controller)),
             ($instance instanceof Listener) => $this->postProcess->enqueue($instance),
         };
+    }
+
+    private function getReflect($routeHandler)
+    {
+        if (is_array($routeHandler)) {
+            [$controller, $method] = $routeHandler;
+            $reflect['class'] = new ReflectionClass($controller);
+            $reflect['method'] = new ReflectionMethod($controller, $method);
+        } elseif (is_callable($routeHandler)) {
+            $reflect['func'] = new ReflectionFunction($routeHandler);
+        }
+
+        return $reflect;
+    }
+
+    private function getAttributes($reflect)
+    {
+        if (isset($reflect['func'])) {
+            return $reflect['func']->getAttributes();
+        }
+
+        return array_merge($reflect['class']->getAttributes(), $reflect['method']->getAttributes());
     }
 }

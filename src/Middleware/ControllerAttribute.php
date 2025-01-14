@@ -34,6 +34,11 @@ final class ControllerAttribute implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $route = $request->getAttribute(Route::class);
+
+        if (!$route) {
+            return $handler->handle($request);
+        }
+        
         $routeHandler = $route->getHandler();
         $reflect = $request->getAttribute('reflect') ?? $this->getReflect($routeHandler);
         $attributes = $this->getAttributes($reflect);

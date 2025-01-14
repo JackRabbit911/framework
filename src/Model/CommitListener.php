@@ -42,7 +42,7 @@ final class CommitListener
                 $model = container()->get($model);
             }
             
-            $model->save($entity);
+            $model?->save($entity);
         }
     }
 

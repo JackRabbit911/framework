@@ -197,6 +197,11 @@ class Collection implements ArrayAccess, IteratorAggregate, Countable
         return new static($this->items);
     }
 
+    public function pop()
+    {
+        return array_pop($this->items);
+    }
+
     public function join($name, $glue = ' ', $finalGlue = '')
     {
         $array = $this->_props($name);

@@ -59,8 +59,13 @@ final class App
             require_once $file;
         }
 
-        $response = $this->pipeline->process($this->request, $this->defaultHandler);
-        $response = $this->postProcess->process($response, $mode);
+        $response = $this->pipeline
+            ->process($this->request, $this->defaultHandler);
+            
+        $response = $this->postProcess
+            ->config(require CONFIG . "post_process.php")
+            ->process($response);
+
         $this->emitter->emit($response, $this->isResponseWithoutBody(
             (string) request()->getMethod(),
             (int) $response->getStatusCode(),

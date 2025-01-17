@@ -70,4 +70,19 @@ class App
 
         return implode('<br>', $scripts);
     }
+
+    public function robots(...$directives)
+    {
+        if (env('APP_ENV') < STAGE) {
+            return '';
+        }
+
+        if (empty($directives)) {
+            $directives = ['noindex', 'nofollow', 'noimageindex'];
+        }
+
+        $directives = implode(', ', $directives);
+
+        return '<meta name="robots" content="' . $directives . '" />';
+    }
 }

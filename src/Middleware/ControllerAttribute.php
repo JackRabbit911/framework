@@ -15,7 +15,7 @@ use ReflectionFunction;
 use ReflectionMethod;
 use Sys\Observer\Interface\Listener;
 use Sys\Observer\Interface\Observer;
-use Sys\PostProcess;
+use Sys\PostProcess\PostProcess;
 use TypeError;
 
 final class ControllerAttribute implements MiddlewareInterface

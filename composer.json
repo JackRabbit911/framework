@@ -25,7 +25,7 @@
         "filp/whoops": "^2.15",
         "league/climate": "^3.8",
         "symfony/yaml": "^6.2",
-        "josegonzalez/dotenv": "^4.0"
+        "vlucas/phpdotenv": "^5.5",
         "erusev/parsedown": "^1.7",
         "dragonmantank/cron-expression": "^3.3",
         "phpmailer/phpmailer": "^6.8",

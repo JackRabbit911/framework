@@ -1,14 +1,9 @@
 <?php
 
 use Sys\I18n\I18n;
-// use Az\Session\Session;
-use Az\Validation\Csrf;
 use Az\Route\RouterInterface;
 use Az\Session\SessionInterface;
-use Dotenv\Dotenv;
 use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Component\Yaml\Yaml;
-use Sys\App;
 use Sys\Config\Config;
 use Sys\SimpleRequest;
 use Sys\Template\Template;
@@ -34,7 +29,8 @@ function env(string $key, $default = null)
     static $entries;
 
     if (!$entries) {
-        $entries = (Dotenv::createImmutable(ENVPATH))->load();
+        $loader = new josegonzalez\Dotenv\Loader(ENVPATH . '.env');
+        $entries = $loader->parse()->toArray();
     }
 
     if (isset($entries[$key])) {
@@ -42,17 +38,6 @@ function env(string $key, $default = null)
     } else {
         $entry = $default;
     }
-
-    if ($entry && ctype_digit($entry)) {
-        $entry = (int) $entry;
-    }
-
-    $entry = match ($entry) {
-        'on', 'yes', 'true' => true,
-        'no', 'off', 'false' => false,
-        'null' => null,
-        default => $entry,
-    };
 
     if (is_string($entry) && preg_match('/\{(.+?)\}/', $entry, $matches)) {
         $entry = $matches[1];

@@ -2,13 +2,13 @@
 
 namespace Sys;
 
-// use Sys\Profiler\Profiler;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use HttpSoft\Runner\MiddlewarePipelineInterface;
 use HttpSoft\Runner\MiddlewareResolverInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 use HttpSoft\Emitter\EmitterInterface;
 use Sys\Exception\SetErrorHandlerInterface;
+use Sys\PostProcess\PostProccessInterface;
 
 final class App
 {
@@ -19,7 +19,7 @@ final class App
     private MiddlewareResolverInterface $resolver;
     private RequestHandlerInterface $defaultHandler;
     private EmitterInterface $emitter;
-    private PostProcess $postProcess;
+    private PostProccessInterface $postProcess;
 
     public function __construct(
         ServerRequestInterface $request,
@@ -28,7 +28,7 @@ final class App
         EmitterInterface $emitter,
         SetErrorHandlerInterface $setErrorHandler,
         RequestHandlerInterface $defaultHandler,
-        PostProcess $postProcess,
+        PostProccessInterface $postProcess,
     )
     {
         $this->request = $request;

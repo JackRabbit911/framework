@@ -73,7 +73,7 @@ class App
 
     public function robots(...$directives)
     {
-        if (env('APP_ENV') < STAGE) {
+        if (ENV < STAGE) {
             return '';
         }
 

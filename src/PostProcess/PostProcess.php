@@ -1,13 +1,11 @@
 <?php
 
-namespace Sys;
+namespace Sys\PostProcess;
 
 use Psr\Http\Message\ResponseInterface;
-use SplObjectStorage;
 use Sys\Model\CommitListener;
-use Sys\PostProcess\PostProccessHandlerInterface;
-use Sys\PostProcess\PostProccessInterface;
 use Sys\Profiler\Profiler;
+use SplObjectStorage;
 
 class PostProcess implements PostProccessInterface
 {

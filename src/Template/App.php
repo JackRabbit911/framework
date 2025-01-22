@@ -2,6 +2,9 @@
 
 namespace Sys\Template;
 
+use Psr\Http\Message\ServerRequestInterface;
+use Sys\SimpleRequest;
+
 class App
 {
     private array $objects = [];
@@ -54,9 +57,20 @@ class App
         return $instance;
     }
 
-    public function request($psr = false)
+    public function request()
     {
-        return request($psr);
+        static $simple_request;
+
+        if ($simple_request) {
+            return $simple_request;
+        }
+
+        $request = $this->objects['request']
+            ?? $GLOBALS['request']
+            ?? container()->get(ServerRequestInterface::class);
+
+        $simple_request = new SimpleRequest($request);
+        return $simple_request;
     }
 
     public function js(?string $file = null)

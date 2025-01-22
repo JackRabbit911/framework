@@ -19,12 +19,17 @@ class SimpleRequest
         return $this->request->getAttribute($name);
     }
 
-    public function uri(): string
+    public function psr()
+    {
+        return $this->request;
+    }
+
+    public function path(): string
     {
         return $this->request->getUri()->getPath();
     }
 
-    public function url()
+    public function uri()
     {
         return (string) $this->request->getUri();
     }

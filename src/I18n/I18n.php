@@ -1,41 +1,31 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Sys\I18n;
 
 use Sys\I18n\Model\I18nModelInterface;
 use Sys\Trait\Options;
-// use Sys\I18n\Model\File;
+use Sys\I18n\Enum\DetectionMethod;
+use Sys\I18n\Enum\Redirect;
+use Psr\Http\Message\ServerRequestInterface;
 
 final class I18n
 {
     use Options;
 
-    const NONE = 0;
-    const LANG_TO_EMPTY = 1;
-    const EMPTY_TO_LANG = 2;
-
-    public readonly string $langSegment;
-    public readonly array $linksList;
-    private string $lang;
-    private array $langs = ['en' => 'English'];
+    public DetectionMethod $detectionMethod;
+    public Redirect $redirect = Redirect::None;
     private I18nModelInterface $model;
-    private int $redirect = self::NONE;
+    private string $lang;
+    private array $langs = [];
+    private int $index = 0;
+    private bool $needInsertSegment = false;
 
-    public function __construct(I18nModelInterface $model)
+    public function __construct(ServerRequestInterface $request, ?I18nModelInterface $model = null)
     {
         $this->options();
-        $this->lang = $this->baseLang();
-        $this->model = $model;
-    }
-
-    public function __call($name, $arguments)
-    {
-        return $$name;
-    }
-
-    public function setVar($name, $value)
-    {
-        $this->$name = $value;
+        $detector = new DetectLang($this->langs, $this->index);
+        $this->lang = $detector->detectLang($request, $this->detectionMethod);
+        $this->model = $model ?: container()->get(I18nModelInterface::class);
     }
 
     public function lang(?string $lang = null): string
@@ -47,59 +37,54 @@ final class I18n
         return $this->lang;
     }
 
-    public function list($all = false): array
+    public function langs()
     {
-        $langs = $this->langs;
-
-        if (!$all) {
-            unset($langs[$this->lang]);
-        }
-
-        return $langs;
+        return $this->langs;
     }
 
     public function baseLang()
     {
-        return array_key_first($this->langs);
+        return array_key_first($this->langs) ?? 'en';
     }
 
-    public function regex(): string
-    {        
-        $regex = implode('|', array_keys($this->langs));
-
-        if ($this->redirect > self::NONE) {
-            $regex .= '|';
-        }
-
-        return $regex;
-    }
-
-    public function language($lang = null): string
+    public function gettext(string $string, array $values = null): string
     {
-        if (!$lang) {
-            $lang = $this->lang;
-        }
-
-        return $this->langs[$lang];
+        $string = $this->model->get($this->lang, $string);
+        return ($values) ? strtr($string, $values) : $string;
     }
 
-    public function langSegment(?string $lang = null): string
+    public function detectLang(ServerRequestInterface $request)
     {
-        if (!$lang) {
-            $lang = $this->lang;
-        }
+        $detector = new DetectLang($this->langs, $this->index);
+        $lang = $detector->detectLang($request, $this->detectionMethod);
 
-        if ($this->redirect === self::LANG_TO_EMPTY 
-            && $this->baseLang() === $lang) {
-                return '';
-        }
-        
         return $lang;
     }
 
-    public function getRedirect()
+    public function path(string $path): string
     {
-        return $this->redirect;
+        if (!$this->needInsertSegment) {
+            return $path;
+        }
+
+        return $this->_path($path, $this->lang);
+    }
+
+    public function needInsertSegment()
+    {
+        $this->needInsertSegment = true;
+    }
+
+    public function linksList($path)
+    {
+        foreach ($this->langs as $lang => $title) {
+            if ($this->lang != $lang) {
+                $key = $this->_path($path, $lang);
+                $list[$key] = $title;               
+            }
+        }
+
+        return $list;
     }
 
     public function addPath(string $path)
@@ -107,9 +92,12 @@ final class I18n
         $this->model->addPath($path);
     }
 
-    public function gettext(string $string, array $values = null): string
+    private function _path($path, $lang)
     {
-        $string = $this->model->get($this->lang, $string);
-        return ($values) ? strtr($string, $values) : $string;
+        $arr = explode('/', trim($path, '/'));
+        $arr = array_merge(array_slice($arr, 0, $this->index),
+            [$lang],
+            array_slice($arr, $this->index));
+        return '/' . rtrim(implode ('/', $arr), '/');
     }
 }

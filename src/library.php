@@ -128,24 +128,24 @@ function path($routeName, $params = [])
 {
     $container = container();
     $router = $container->get(RouterInterface::class);
+    $path = $router->path($routeName, $params);
 
-    if (!array_key_exists('lang', $params) && $container->has(I18n::class)) {
+    if ($container()->has(I18n::class)) {
         $i18n = $container->get(I18n::class);
-        $params['lang'] = rtrim($i18n->langSegment(), '/');
+        $path = $i18n->path($path);
     }
 
-    $uriPrefix = $GLOBALS['URI_PREFIX'] ?? '/';
-
-    return $uriPrefix . trim($router->path($routeName, $params), '/');
+    $uriPrefix = $GLOBALS['URI_PREFIX'] ?? '';
+    return $uriPrefix . $path;
 }
 
 function url($routeName = null, $params = [])
 {
     $request = container()->get(ServerRequestInterface::class);
-    $scheme = getScheme($request);
-    $host = $request->getServerParams()['SERVER_NAME'];
-
-    $path = ($routeName) ? path($routeName, $params) : $request->getServerParams()['REQUEST_URI'];
+    $uri = $request->getUri();
+    $scheme = $uri->getScheme();
+    $host = $uri->getHost();
+    $path = ($routeName) ? path($routeName, $params) : $uri->getPath();
 
     return $scheme . '://' . $host . $path;
 }
@@ -185,24 +185,6 @@ function createCsrf()
     $session = container()->get(SessionInterface::class);
     $session->set('_csrf', $token);
     return $token;
-}
-
-function getScheme($request)
-{
-    $serverParams = $request->getServerParams();
-
-    if (isset($serverParams['HTTPS'])) {
-        $scheme = $serverParams['HTTPS'];
-    } else {
-        $scheme = '';
-    }
-
-    if (($scheme) && ($scheme != 'off')) {
-        return'https';
-    }
-    else {
-        return 'http';
-    }
 }
 
 function getCallable(string|array $callable): mixed

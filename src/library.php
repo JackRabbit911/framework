@@ -130,7 +130,7 @@ function path($routeName, $params = [])
     $router = $container->get(RouterInterface::class);
     $path = $router->path($routeName, $params);
 
-    if ($container()->has(I18n::class)) {
+    if ($container->has(I18n::class)) {
         $i18n = $container->get(I18n::class);
         $path = $i18n->path($path);
     }

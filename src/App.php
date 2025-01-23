@@ -8,7 +8,7 @@ use HttpSoft\Runner\MiddlewarePipelineInterface;
 use HttpSoft\Runner\MiddlewareResolverInterface;
 use HttpSoft\Emitter\EmitterInterface;
 use Sys\Exception\SetErrorHandlerInterface;
-use Sys\PostProcess\PostProccessInterface;
+use Sys\PostProcess\PostProcessInterface;
 
 final class App
 {
@@ -19,7 +19,7 @@ final class App
     private MiddlewareResolverInterface $resolver;
     private RequestHandlerInterface $defaultHandler;
     private EmitterInterface $emitter;
-    private PostProccessInterface $postProcess;
+    private PostProcessInterface $postProcess;
 
     public function __construct(
         ServerRequestInterface $request,
@@ -28,7 +28,7 @@ final class App
         EmitterInterface $emitter,
         SetErrorHandlerInterface $setErrorHandler,
         RequestHandlerInterface $defaultHandler,
-        PostProccessInterface $postProcess,
+        PostProcessInterface $postProcess,
     )
     {
         $this->request = $request;
@@ -47,23 +47,18 @@ final class App
 
     public function run(): void
     {
-        $mode = getMode();
-
-        $file = CONFIG . "pipeline/$mode.php";
+        $file = CONFIG . 'pipeline/' . getMode() . '.php';
         if ($file && is_file($file)) {
             require_once $file;
         }
 
-        $file = CONFIG . "pipeline/common.php";
-        if ($file && is_file($file)) {
-            require_once $file;
-        }
+        $this->pipe(config('pipeline'));
 
         $response = $this->pipeline
             ->process($this->request, $this->defaultHandler);
             
         $response = $this->postProcess
-            ->config(require CONFIG . "post_process.php")
+            ->config('post_process')
             ->process($response);
 
         $this->emitter->emit($response, $this->isResponseWithoutBody(

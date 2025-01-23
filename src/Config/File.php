@@ -31,6 +31,22 @@ final class File
             }
         }
 
+        return $result ?: $this->default($file);
+
         return (empty($result)) ? null : $result;
+    }
+
+    public function default($key)
+    {
+        static $default;
+
+        if ($default) {
+            return $default[$key] ?? null;
+        }
+
+        $file = __DIR__ . '/default.php';
+        $default = require_once $file;
+
+        return $default[$key] ?? null;
     }
 }

@@ -7,7 +7,7 @@ use Sys\Model\CommitListener;
 use Sys\Profiler\Profiler;
 use SplObjectStorage;
 
-class PostProcess implements PostProccessInterface
+class PostProcess implements PostProcessInterface
 {
     private SplObjectStorage $queue;
 
@@ -42,8 +42,12 @@ class PostProcess implements PostProccessInterface
         }
     }
 
-    public function config(array $config): self
+    public function config(array|string $config): self
     {
+        if (is_string($config)) {
+            $config = config($config);
+        }
+        
         foreach ($config as $listener) {
             $this->enqueue($listener);
         }

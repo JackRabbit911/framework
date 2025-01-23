@@ -4,11 +4,11 @@ namespace Sys\PostProcess;
 
 use Psr\Http\Message\ResponseInterface;
 
-interface PostProccessInterface
+interface PostProcessInterface
 {
     public function process(ResponseInterface $response): ResponseInterface;
 
     public function enqueue(object $object);
 
-    public function config(array $config): self;
+    public function config(array|string $config): self;
 }

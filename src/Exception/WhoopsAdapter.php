@@ -29,7 +29,7 @@ final class WhoopsAdapter implements SetErrorHandlerInterface
 
         if (\Whoops\Util\Misc::isAjaxRequest() 
             || strpos($accept_header, 'application/json') === 0
-            || getMode() === 'api') {
+            || MODE === 'api') {
             $whoops->pushHandler(new \Whoops\Handler\JsonResponseHandler);
             $responseType = ResponseType::json;
         } elseif (\Whoops\Util\Misc::isCommandLine()) {

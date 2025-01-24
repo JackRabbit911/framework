@@ -47,7 +47,7 @@ final class App
 
     public function run(): void
     {
-        $file = CONFIG . 'pipeline/' . getMode() . '.php';
+        $file = CONFIG . 'pipeline/' . MODE . '.php';
         if ($file && is_file($file)) {
             require_once $file;
         }

@@ -82,34 +82,6 @@ function dot(&$arr, $path, $default = null, $separator = '.') {
     return $arr;
 }
 
-function getMode(?string $path = null)
-{
-    static $mode;
-
-    if (isset($mode)) {
-        return $mode;
-    }
-
-    if (PHP_SAPI === 'cli') {
-        $mode = 'cli';
-        return $mode;
-    }
-
-    $arrMode = ($path) ? require $path : config('mode', null, []);
-
-    foreach ($arrMode as $key => $paths) {
-        foreach ($paths as $path) {
-            if (strpos($_SERVER['REQUEST_URI'], $path . '/') === 0) {
-                $mode = $key;
-                return $mode;
-            }
-        }
-    }
-
-    $mode = 'web';
-    return $mode;
-}
-
 function __(string $string, ?array $values = null): string
 {
     if (container()->has(I18n::class)) {
@@ -152,7 +124,6 @@ function url($routeName = null, $params = [])
 
 function findPath($path, $all = false)
 {
-    // $paths = [CONFIG];
     $paths = glob(APPPATH . '*{\/src,}/' . ltrim($path, '/'), GLOB_BRACE);
 
     foreach ($paths as $path) {
@@ -163,9 +134,9 @@ function findPath($path, $all = false)
                 return $path;
             }
         }
-
-        return $result ?? null;
     }
+
+    return $result ?? null;
 }
 
 function json(?string $string, $unique = false)

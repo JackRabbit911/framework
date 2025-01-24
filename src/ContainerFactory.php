@@ -2,37 +2,30 @@
 
 namespace Sys;
 
-use DI\Container;
 use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
-use Dotenv\Dotenv;
 
 final class ContainerFactory
 {
-    private $container;
-    private string $mode;
-
-    public function __construct(string $mode)
+    public function create(ContainerBuilder $builder): ContainerInterface
     {
-        $this->mode = $mode;
-    }
-
-    public function create(ContainerBuilder $builder): Container
-    {
-        if ($this->container instanceof ContainerInterface) {
-            return $this->container;
-        }
-
         $builder->useAttributes(true);
 
-        $path = CONFIG . 'container/';
+        $files = [
+            __DIR__ . '/Config/container.php',
+            CONFIG . 'container/common.php',
+            CONFIG . 'container/' . MODE . '.php',
+        ];
 
-        if (is_file(($common = $path . 'common.php'))) {
-            $builder->addDefinitions(require_once $common);
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                $builder->addDefinitions($file);
+            }
         }
 
-        if (is_file(($mode = $path . $this->mode . '.php'))) {
-            $builder->addDefinitions(require_once $mode);
+        if (IS_CACHE) {
+            $builder->addDefinitions(CONFIG . 'container/autowire.php');
+            $builder->enableCompilation(STORAGE . 'cache');
         }
 
         return $builder->build();

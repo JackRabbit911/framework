@@ -17,7 +17,7 @@ use Sys\Exception\WhoopsAdapter;
 use Sys\DefaultHandler;
 use Sys\Exception\ExceptionResponseFactory;
 use Pecee\Pixie\Connection;
-use Pecee\Pixie\QueryBuilder\QueryBuilderHandler;
+use Pecee\Pixie\QueryBuilder\IQueryBuilderHandler;
 use Az\Session\Session;
 use Az\Session\Driver;
 use Az\Session\SessionInterface;
@@ -57,12 +57,12 @@ return [
         => new WhoopsAdapter($request, $logger, $emitter, $response_factory),
     
     PostProcessInterface::class => fn() => new PostProcess(),
-    QueryBuilderHandler::class => fn() => (new Connection('mysql', config('database', 'connect.mysql')))->getQueryBuilder(),
+    IQueryBuilderHandler::class => fn() => (new Connection('mysql', config('database', 'connect.mysql')))->getQueryBuilder(),
     
     SessionInterface::class => function (ContainerInterface $c) {
         switch (env('SESSION_DRIVER')) {
             case 'DB':
-                $qb = $c->get(QueryBuilderHandler::class);
+                $qb = $c->get(IQueryBuilderHandler::class);
                 $handler = new Driver\Db($qb->pdo());
                 break;
             default:

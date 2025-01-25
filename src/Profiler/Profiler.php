@@ -2,7 +2,6 @@
 
 namespace Sys\Profiler;
 
-use Az\Route\RouteCollectionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Sys\Profiler\Model\ProfilerModelInterface;
 
@@ -10,16 +9,16 @@ final class Profiler
 {
     private ProfilerModelInterface $model;
 
-    public function __construct(ProfilerModelInterface $model, RouteCollectionInterface $route)
+    public function __construct(ProfilerModelInterface $model)
     {
         $this->model = $model;
         $this->model->setProfiling();
     }
 
-    public function __invoke(ResponseInterface $response, string $mode)
+    public function __invoke(ResponseInterface $response)
     {
         if (strpos($_SERVER['REQUEST_URI'], '/media/0/vendor/az/sys/src/Profiler/profiler.js') !== 0 
-            && strpos($_SERVER['REQUEST_URI'], '/~profiler/') !== 0 && $mode === 'web') {
+            && strpos($_SERVER['REQUEST_URI'], '/~profiler/') !== 0 && MODE === 'web') {
             $stream = $response->getBody();
             $size = $stream->getSize();
             register_shutdown_function([$this,'shutdown'], $size);

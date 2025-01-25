@@ -25,7 +25,7 @@ class PostProcess implements PostProcessInterface
         }
 
         if (IS_DEBUG) {
-            $response = container()->call(Profiler::class, ['response' => $response, 'mode' => getMode()]);
+            $response = container()->call(Profiler::class, ['response' => $response]);
         }
 
         return $response;

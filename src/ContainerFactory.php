@@ -24,7 +24,12 @@ final class ContainerFactory
         }
 
         if (IS_CACHE) {
-            $builder->addDefinitions(CONFIG . 'container/autowire.php');
+            $autowire_config = CONFIG . 'container/autowire.php';
+
+            if (is_file($autowire_config)) {
+                $builder->addDefinitions(CONFIG . 'container/autowire.php');
+            }
+            
             $builder->enableCompilation(STORAGE . 'cache');
         }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Sys;
+namespace Sys\Response;
 
 use HttpSoft\Response\ResponseExtensionTrait;
 use HttpSoft\Response\ResponseStatusCodeInterface;

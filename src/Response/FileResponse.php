@@ -1,6 +1,6 @@
 <?php
 
-namespace Sys;
+namespace Sys\Response;
 
 use Sys\Helper\Facade\File;
 use HttpSoft\Response\ResponseExtensionTrait;

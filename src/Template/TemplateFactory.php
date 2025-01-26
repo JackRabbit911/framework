@@ -8,10 +8,19 @@ use Twig\TwigFunction;
 
 class TemplateFactory
 {
+    private array $options = [
+        'strict_variables' => ENV > PRODUCTION,
+        'debug' => ENV > PRODUCTION,
+    ];
+
     public function create($config = null): Template
     {
-        $viewPath = $config['view_path'] ?? 'app/views';
-        $options = $config['options'] ?? [];
+        if (!$config) {
+            $config = config('template');
+        }
+
+        $viewPath = $config['view_path'] ?? glob(APPPATH . '**/views/', GLOB_ONLYDIR);
+        $options = $config['options'] ?? $this->options;
 
         $loader = new FilesystemLoader($viewPath, APPPATH);
         $twig = new Environment($loader, $options);
@@ -48,5 +57,5 @@ class TemplateFactory
         }));
 
         return new Template($twig, 'twig');
-    }   
+    }
 }

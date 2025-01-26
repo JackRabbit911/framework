@@ -12,20 +12,20 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Sys\FileResponse;
 use Sys\I18n\I18n;
-use Sys\Template\Template;
 use Sys\Template\App;
+use Sys\Template\TemplateInterface;
 
 abstract class WebController extends BaseController
 {
     protected ?SessionInterface $session;
-    protected ?Template $tpl;
+    protected ?TemplateInterface $tpl;
     protected $user;
     protected ?I18n $i18n;
     protected App $app;
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $this->tpl = container()->get(Template::class);
+        $this->tpl = container()->get(TemplateInterface::class);
         $this->app = container()->get(App::class);
 
         $i18n = $request->getAttribute('i18n');

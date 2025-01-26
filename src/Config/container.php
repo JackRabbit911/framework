@@ -27,6 +27,10 @@ use Monolog\Level;
 use Psr\Http\Server\RequestHandlerInterface;
 use Sys\PostProcess\PostProcessInterface;
 use Sys\PostProcess\PostProcess;
+use Sys\Template\TemplateFactory;
+use Sys\Template\TemplateInterface;
+use Sys\I18n\Model\File;
+use Sys\I18n\Model\I18nModelInterface;
 use Sys\Profiler\Model\Mysql;
 use Sys\Profiler\Model\ProfilerModelInterface;
 use Sys\Profiler\Profiler;
@@ -71,6 +75,9 @@ return [
 
         return new Session(config('session'), $handler);
     },
+
+    TemplateInterface::class => fn() => (new TemplateFactory())->create(),
+    I18nModelInterface::class => fn() => new File,
     
     // ProfilerModelInterface::class => fn(ContainerInterface $c) => $c->get(Mysql::class),
     // Profiler::class => fn(ContainerInterface $c)

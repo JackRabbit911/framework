@@ -6,11 +6,11 @@ use Az\Session\SessionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Sys\Config\Config;
 use Sys\SimpleRequest;
-use Sys\Template\Template;
 use HttpSoft\Emitter\SapiEmitter;
 use Sys\Exception\ExceptionResponseFactory;
 use Sys\Helper\MimeNegotiator;
 use Sys\Helper\ResponseType;
+use Sys\Template\TemplateInterface;
 
 function dd(...$values)
 {
@@ -245,7 +245,7 @@ function view(string $view, array $params = []): string
     static $tpl;
 
     if (!$tpl) {
-        $tpl = container()->get(Template::class);
+        $tpl = container()->get(TemplateInterface::class);
     }
 
     return $tpl->render($view, $params);

@@ -5,7 +5,7 @@ namespace Sys\Template;
 use RuntimeException;
 use Twig\TwigFunction;
 
-class Template
+class Template implements TemplateInterface
 {
     private $engine;
     private string $ext;

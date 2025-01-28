@@ -26,6 +26,14 @@ return [
             ],
         ],
     ],
+    'mail/mail' => [
+        'is_smtp' => env('MAIL_IS_SMTP'),
+        'smtp' => env('MAIL_SMTP'),
+        'smtp_port' => env('MAIL_SMTP_PORT'),
+        'smtp_auth' => env('MAIL_SMTP_AUTH'),
+        'smtp_secure' => env('MAIL_SMTP_SECURE'),
+        'from_name' => env('MAIL_FROM_NAME'),
+    ],
     'post_process' => [
             Robots::class,
             CommitListener::class,

@@ -6,6 +6,8 @@ final class ClearLog extends LogAbstract
 {
     protected function all()
     {
+        $data = [];
+        
         foreach (glob($this->path . '*.log') as $file) {
             $filename = pathinfo($file, PATHINFO_BASENAME);
             $data[] = $filename;

@@ -24,7 +24,7 @@ function dd(...$values)
     exit;
 }
 
-function env(string $key, $default = null)
+function env(?string $key = null, $default = null)
 {
     static $entries;
 
@@ -33,19 +33,22 @@ function env(string $key, $default = null)
         $entries = $loader->parse()->toArray();
     }
 
-    if (isset($entries[$key])) {
-        $entry = trim($entries[$key]);
-    } else {
-        $entry = $default;
+    $entry = (isset($entries[$key])) ? $entries[$key] : $default;
+
+    if (is_string($entry)) {
+        if (preg_match('/\{(.+?)\}/', $entry, $matches)) {
+            $entry = $matches[1];
+            $dc = get_defined_constants(true)['user'];
+            $entry = $dc[$entry];
+        }
+
+        if (preg_match('/\[(.+?)\]/', $entry, $matches)) {
+            $entry = $matches[1];
+            $entry = explode(',', str_replace([' ', "'", '"'], '', $entry));
+        }
     }
 
-    if (is_string($entry) && preg_match('/\{(.+?)\}/', $entry, $matches)) {
-        $entry = $matches[1];
-        $dc = get_defined_constants(true)['user'];
-        $entry = $dc[$entry];
-    }
-
-    return $entry;
+    return ($key) ? $entry : $entries;
 }
 
 function container()

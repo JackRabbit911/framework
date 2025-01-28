@@ -5,7 +5,10 @@ namespace Sys\Console;
 use HttpSoft\Response\JsonResponse;
 use Psr\Container\ContainerInterface;
 use Sys\Controller\BaseController;
+use Az\Route\Route;
 
+#[Route(methods: ['post', 'get'])]
+#[Route(filter: 'Sys\Console\filter')]
 final class Controller extends BaseController
 {
     private ContainerInterface $container;
@@ -29,4 +32,16 @@ final class Controller extends BaseController
 
         return new JsonResponse($data);
     }
+}
+
+function filter($route)
+{
+    $params = $route->getParameters();
+    $model = str_replace('/', '\\', $params['model']);
+
+    if (method_exists($model, $params['method'])) {
+        return true;
+    }
+
+    return false;
 }

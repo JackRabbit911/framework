@@ -2,7 +2,7 @@
 
 namespace Sys\Console\Commands;
 
-use App\Jobs\SessGC;
+use Sys\Job\SessGC;
 use Sys\Console\Command;
 use Sys\Console\CallApi;
 

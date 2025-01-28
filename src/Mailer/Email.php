@@ -12,11 +12,12 @@ use Exception;
 class Email implements IteratorAggregate
 {
     public array $data;
-    public array $to;
+    public array $address;
     public array $from;
     public array $cc;
     public array $bcc;
     public array $attach;
+    public array $reply;
     public string $username;
     public string $password;
     public string $subject;
@@ -45,38 +46,33 @@ class Email implements IteratorAggregate
         return new ArrayIterator($this);
     }
 
-    public function __call($key, $args)
-    {
-        $this->$key = [$args[0], $args[1] ?? []];
-        return $this;
-    }
-
-    public function to(mixed $to, string $name = ''): self
-    {
-        if (is_array($to)) {
-            foreach ($to as $recipient) {
-                if (is_array($recipient)) {
-                    $this->address($recipient[0], $recipient[1]);
-                    $this->data['username'] = $recipient[1];
-                } elseif(is_object($recipient)) {
-                    $this->address($recipient->email, $recipient->name);
-                    $this->data['username'] = $recipient->name;
-                }
-            }
-        } elseif(is_object($to)) {
-            $this->address($to->email, $to->name);
-            $this->data['username'] = $to->name;
-        } elseif(is_string($to)) {
-            $this->address($to, $name);
-            $this->data['username'] = $name;
-        }
-
-        return $this;
-    }
-
     public function address(string $address, string $name = ''): self
     {
-        $this->to[] = [$address, $name];
+        $this->address[] = [$address, $name];
+        return $this;
+    }
+
+    public function cc(string $address, string $name = ''): self
+    {
+        $this->cc[] = [$address, $name];
+        return $this;
+    }
+
+    public function bcc(string $address, string $name = ''): self
+    {
+        $this->bcc[] = [$address, $name];
+        return $this;
+    }
+    
+    public function reply(string $address, string $name = ''): self
+    {
+        $this->reply[] = [$address, $name];
+        return $this;
+    }
+
+    public function from(string $address, string $name = ''): self
+    {
+        $this->from = [$address, $name];
         return $this;
     }
 
@@ -91,20 +87,33 @@ class Email implements IteratorAggregate
         $this->body = $body;
         return $this;
     }
-
-    public function data(array $data = []): self
-    {
-        $this->data = $data;
-        return $this;
-    }
-
+   
     public function attach(string $path): self
     {
         if (!is_file($path)) {
             throw new Exception(sprintf('File %s not found', $path));
         }
-
+        
         $this->attach[] = $path;
+        return $this;
+    }
+
+
+    public function username(string $username): self
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    public function password(string $password): self
+    {
+        $this->username = $password;
+        return $this;
+    }
+
+    public function data(array $data = []): self
+    {
+        $this->data = $data;
         return $this;
     }
 
@@ -128,12 +137,6 @@ class Email implements IteratorAggregate
         }
 
         return $this;
-    }
-
-    public function mailbox($username, $password)
-    {
-        $this->username = $username;
-        $this->password = $password;
     }
 
     public function send(): void

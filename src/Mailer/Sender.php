@@ -40,10 +40,31 @@ class Sender
         $this->mailer->Password = $password;
     }
 
-    public function to(array $to)
+    public function address(array $to)
     {
         foreach ($to as [$address, $name]) {
             $this->mailer->addAddress($address, $name);
+        }
+    }
+
+    public function cc(array $cc)
+    {
+        foreach ($cc as [$address, $name]) {
+            $this->mailer->addCC($address, $name);
+        }
+    }
+    
+    public function bcc(array $bcc)
+    {
+        foreach ($bcc as [$address, $name]) {
+            $this->mailer->addBCC($address, $name);
+        }
+    }
+
+    public function reply(array $reply)
+    {
+        foreach ($reply as [$address, $name]) {
+            $this->mailer->addReplyTo($address, $name);
         }
     }
 
@@ -68,20 +89,6 @@ class Sender
     public function body(string $body)
     {
         $this->mailer->Body = $body;
-    }
-
-    public function cc(array $cc)
-    {
-        foreach ($cc as [$address, $name]) {
-            $this->mailer->addCC($address, $name);
-        }
-    }
-
-    public function bcc(array $bcc)
-    {
-        foreach ($bcc as [$address, $name]) {
-            $this->mailer->addBCC($address, $name);
-        }
     }
 
     public function view(string $view, $data = [])

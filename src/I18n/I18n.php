@@ -20,11 +20,11 @@ final class I18n
     private int $index = 0;
     private bool $needInsertSegment = false;
 
-    public function __construct(ServerRequestInterface $request, ?I18nModelInterface $model = null)
+    public function __construct(ServerRequestInterface $request, I18nModelInterface $model)
     {
         $this->options();
         $this->lang = $this->detectLang($request);
-        $this->model = $model ?: container()->get(I18nModelInterface::class);
+        $this->model = $model;
     }
 
     public function lang(?string $lang = null): string
@@ -55,11 +55,7 @@ final class I18n
     public function detectLang(ServerRequestInterface $request)
     {
         $detector = new DetectLang($this->langs, $this->index);
-        $lang = $detector->detectLang($request, $this->detectionMethod);
-
-        dd($this->langs, $lang);
-
-        return $lang;
+        return $detector->detectLang($request, $this->detectionMethod);
     }
 
     public function path(string $path): string

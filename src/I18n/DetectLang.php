@@ -60,18 +60,12 @@ class DetectLang
 
     public function detectLang(ServerRequestInterface $request, DetectionMethod $method): string
     {
-        $lang = match ($method) {
+        return match ($method) {
             $method::Segment => $this->detectBySegment($request->getUri()->getPath()),
             $method::Subdomain => $this->detectBySubdomain($request->getUri()->getHost()),
-            default => null,
+            default => $this->detectByHeader($request->getHeaderLine('Accept-Language'))
+                ?: array_key_first($this->langs) ?? 'en',
         };
-
-        if (is_null($lang)) {
-            $lang = $this->detectByHeader($request->getHeaderLine('Accept-Language'))
-                ?: array_key_first($this->langs) ?? 'en';
-        }
-
-        return $lang;
     }
 
     private function getLangFromArray($array): ?string

@@ -12,7 +12,7 @@ final class I18n
 {
     use Options;
 
-    public DetectionMethod $detectionMethod;
+    public DetectionMethod $detectionMethod = DetectionMethod::None;
     public Redirect $redirect = Redirect::None;
     private I18nModelInterface $model;
     private string $lang;
@@ -23,8 +23,7 @@ final class I18n
     public function __construct(ServerRequestInterface $request, ?I18nModelInterface $model = null)
     {
         $this->options();
-        $detector = new DetectLang($this->langs, $this->index);
-        $this->lang = $detector->detectLang($request, $this->detectionMethod);
+        $this->lang = $this->detectLang($request);
         $this->model = $model ?: container()->get(I18nModelInterface::class);
     }
 
@@ -57,6 +56,8 @@ final class I18n
     {
         $detector = new DetectLang($this->langs, $this->index);
         $lang = $detector->detectLang($request, $this->detectionMethod);
+
+        dd($this->langs, $lang);
 
         return $lang;
     }

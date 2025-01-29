@@ -5,7 +5,7 @@ namespace Sys\I18n\Model;
 final class File implements I18nModelInterface
 {
     private array $map = [];
-    private array $paths;
+    private ?array $paths;
 
     public function get(string $lang, string $str, array $values = []): string
     {
@@ -23,7 +23,7 @@ final class File implements I18nModelInterface
 
     private function setMap(string $lang): void
     {
-        $this->paths = findPath('config/i18n/', true);
+        $this->paths = findPath('config/i18n/', true) ?: [];
 
         foreach ($this->paths as $path) {
             $file = trim($path, '/') . '/' . $lang . '.php';

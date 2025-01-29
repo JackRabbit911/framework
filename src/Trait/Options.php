@@ -10,7 +10,7 @@ trait Options
             $configFile = strtolower(basename(str_replace('\\', '/', __CLASS__)));
         }
 
-        $this->setOptions(config($configFile));
+        $this->setOptions(config($configFile, null, []));
     }
 
     public function setOptions(array $options): void

@@ -74,6 +74,6 @@ class DetectLang
             return $array[$this->index];
         }
 
-        return null;
+        return array_key_first($this->langs);
     }
 }

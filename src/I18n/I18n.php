@@ -84,6 +84,11 @@ final class I18n
         return $list;
     }
 
+    public function currentTitle()
+    {
+        return $this->langs[$this->lang];
+    }
+
     public function addPath(string $path)
     {
         $this->model->addPath($path);

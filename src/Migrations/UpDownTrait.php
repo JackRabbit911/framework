@@ -13,6 +13,11 @@ trait UpDownTrait
     private function setUpDown($path)
     {
         $this->down = (new CallApi(ModelMigrations::class, 'get'))->execute(['path' => $path]);
+
+        if (!is_dir($this->dir . $path)) {
+            $this->climate->out('Directory: ' . $this->dir . $path . ' is not found');
+            exit;
+        }
         
         if ($path === '') {
             $iterator = new \IteratorIterator(

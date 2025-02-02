@@ -38,7 +38,7 @@ trait ComponentForm
     {
         $session = container()->get(SessionInterface::class);
 
-        $validationResponse = $session->keep('validation');
+        $validationResponse = $session->pull('validation');
 
         if ($validationResponse) {
             foreach ($data as $key => &$attribute) {

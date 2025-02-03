@@ -10,7 +10,7 @@ use HttpSoft\Response\TextResponse;
 use HttpSoft\Response\XmlResponse;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Sys\FileResponse;
+use Sys\Response\FileResponse;
 use Sys\I18n\I18n;
 use Sys\Template\App;
 use Sys\Template\TemplateInterface;
@@ -28,15 +28,15 @@ abstract class WebController extends BaseController
         $this->tpl = container()->get(TemplateInterface::class);
         $this->app = container()->get(App::class);
 
-        $i18n = $request->getAttribute('i18n');
+        $this->i18n = $request->getAttribute('i18n');
 
-        if (isset($i18n)) {
-            $this->tpl->addGlobal('lang', $i18n->lang());
+        if (isset($this->i18n)) {
+            $this->tpl->addGlobal('lang', $this->i18n->lang());
         }
 
-        $this->tpl->addFunction('__', function ($string, $values = null) use ($i18n) {
-            if (isset($i18n)) {
-                return $i18n->gettext($string, $values);
+        $this->tpl->addFunction('__', function ($string, $values = null) {
+            if (isset($this->i18n)) {
+                return $this->i18n->gettext($string, $values);
             } else {
                 return ($values) ? strtr($string, $values) : $string;
             }

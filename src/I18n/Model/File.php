@@ -2,10 +2,17 @@
 
 namespace Sys\I18n\Model;
 
-final class File implements I18nModelInterface
+use Symfony\Component\Yaml\Yaml;
+
+class File implements I18nModelInterface
 {
     private array $map = [];
-    private ?array $paths;
+    private array $paths = [];
+
+    public function __construct(array|string $paths = [])
+    {
+        $this->paths = (is_string($paths)) ? [$paths] : $paths;
+    }
 
     public function get(string $lang, string $str, array $values = []): string
     {
@@ -23,12 +30,13 @@ final class File implements I18nModelInterface
 
     private function setMap(string $lang): void
     {
-        $this->paths = findPath('config/i18n/', true) ?: [];
-
         foreach ($this->paths as $path) {
-            $file = trim($path, '/') . '/' . $lang . '.php';
-            if (is_file($file)) {
-                $this->map = array_replace($this->map, require $file);
+            $list = glob($path . '/' . $lang . '.{php,yml,yaml}', GLOB_BRACE);
+
+            if (!empty($list)) {
+                $ext = pathinfo($list[0], PATHINFO_EXTENSION);
+                $content = ($ext === 'php') ? require $list[0] : Yaml::parseFile($list[0]);       
+                $this->map = array_replace($this->map, $content);
             }
         }
     }

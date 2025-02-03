@@ -7,6 +7,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Sys\Config\Config;
 use Sys\SimpleRequest;
 use HttpSoft\Emitter\SapiEmitter;
+use Nette\Utils\Finder;
 use Sys\Exception\ExceptionResponseFactory;
 use Sys\Helper\MimeNegotiator;
 use Sys\Helper\ResponseType;
@@ -125,21 +126,32 @@ function url($routeName = null, $params = [])
     return $scheme . '://' . $host . $path;
 }
 
-function findPath($path, $all = false)
-{
-    $paths = glob(APPPATH . '*{\/src,}/' . ltrim($path, '/'), GLOB_BRACE);
+// function findPath($path, $all = false)
+// {
+//     $paths = glob(APPPATH . '*{\/src,}/' . ltrim($path, '/'), GLOB_BRACE);
 
-    foreach ($paths as $path) {
-        if (file_exists($path)) {
-            if ($all) {
-                $result[] = $path;
-            } else {
-                return $path;
-            }
-        }
+//     foreach ($paths as $path) {
+//         if (file_exists($path)) {
+//             if ($all) {
+//                 $result[] = $path;
+//             } else {
+//                 return $path;
+//             }
+//         }
+//     }
+
+//     return $result ?? null;
+// }
+
+function findPaths(array|string $pattern)
+{
+    $iterator = Finder::findDirectories($pattern)->from(APPPATH);
+
+    foreach ($iterator as $item) {
+        $paths[] = $item->getPathname();
     }
 
-    return $result ?? null;
+    return $paths ?? [];
 }
 
 function json(?string $string, $unique = false)

@@ -29,7 +29,7 @@ use Sys\PostProcess\PostProcessInterface;
 use Sys\PostProcess\PostProcess;
 use Sys\Template\TemplateFactory;
 use Sys\Template\TemplateInterface;
-use Sys\I18n\Model\File;
+use Sys\I18n\Model\File as I18nModelFile;
 use Sys\I18n\Model\I18nModelInterface;
 use Sys\Profiler\Model\Mysql;
 use Sys\Profiler\Model\ProfilerModelInterface;
@@ -77,7 +77,7 @@ return [
     },
 
     TemplateInterface::class => fn() => (new TemplateFactory())->create(),
-    I18nModelInterface::class => fn() => new File,
+    I18nModelInterface::class => fn() => new I18nModelFile(findPaths('i18n')),
     
     // ProfilerModelInterface::class => fn(ContainerInterface $c) => $c->get(Mysql::class),
     // Profiler::class => fn(ContainerInterface $c)

@@ -18,7 +18,7 @@ final class File
     {
         $result = [];
         $ext = pathinfo($file, PATHINFO_EXTENSION);
-        $pattern = ($ext) ? $file : $file . '.{php,yml}';
+        $pattern = ($ext) ? $file : $file . '.{php,yml,yaml}';
 
         foreach ($this->paths as $dir) {
             $list = glob($dir . $pattern, GLOB_BRACE);

@@ -13,22 +13,19 @@ class TemplateFactory
         'debug' => ENV > PRODUCTION,
     ];
 
-    public function create($config = null): Template
+    public function create($paths = null): Template
     {
-        if (!$config) {
-            $config = config('template');
-        }
+        $config = config('template');
 
-        $viewPath = $config['view_path'] ?? glob(APPPATH . '**/views/', GLOB_ONLYDIR);
+        $paths = $paths ?: $config['paths'] ?? findPaths('views');
         $options = $config['options'] ?? $this->options;
 
-        $loader = new FilesystemLoader($viewPath, APPPATH);
+        $loader = new FilesystemLoader($paths, APPPATH);
         $twig = new Environment($loader, $options);
 
         if (ENV > PRODUCTION) {
             $twig->addExtension(new \Twig\Extension\DebugExtension());
         }
-
         
         $twig->addFunction(new TwigFunction('path', function ($routeName, $params = []) {
             return path($routeName, $params);

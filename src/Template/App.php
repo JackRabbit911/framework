@@ -29,6 +29,8 @@ class App
 
     public function cmp($class, array $attributes = [])
     {
+        $attributes = array_merge($attributes, $this->objects);
+
         if (class_exists($class)) {
             return container()->make($class, $attributes);
         }

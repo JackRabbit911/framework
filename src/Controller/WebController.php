@@ -2,6 +2,11 @@
 
 namespace Sys\Controller;
 
+use Sys\Response\FileResponse;
+use Sys\I18n\I18n;
+use Sys\Template\App;
+use Sys\Template\TemplateInterface;
+use Sys\Contract\UserInterface;
 use Az\Session\SessionInterface;
 use HttpSoft\Response\HtmlResponse;
 use HttpSoft\Response\JsonResponse;
@@ -10,16 +15,12 @@ use HttpSoft\Response\TextResponse;
 use HttpSoft\Response\XmlResponse;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Sys\Response\FileResponse;
-use Sys\I18n\I18n;
-use Sys\Template\App;
-use Sys\Template\TemplateInterface;
 
 abstract class WebController extends BaseController
 {
     protected ?SessionInterface $session;
     protected ?TemplateInterface $tpl;
-    protected $user;
+    protected ?UserInterface $user;
     protected ?I18n $i18n;
     protected App $app;
 

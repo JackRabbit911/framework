@@ -78,7 +78,7 @@ class Email implements IteratorAggregate
 
     public function subject(string $subject): self
     {
-        $this->subject = $subject;
+        $this->subject = __($subject);
         return $this;
     }
 
@@ -113,7 +113,7 @@ class Email implements IteratorAggregate
 
     public function data(array $data = []): self
     {
-        $this->data = $data;
+        $this->data = array_merge($data, $this->data);
         return $this;
     }
 

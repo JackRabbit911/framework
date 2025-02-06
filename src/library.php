@@ -145,7 +145,9 @@ function url($routeName = null, $params = [])
 
 function findPaths(array|string $pattern)
 {
-    $iterator = Finder::findDirectories($pattern)->from(APPPATH);
+    $iterator = Finder::findDirectories($pattern)
+        ->from(APPPATH)
+        ->sortByName();
 
     foreach ($iterator as $item) {
         $paths[] = $item->getPathname();

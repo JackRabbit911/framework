@@ -132,7 +132,7 @@ class Email implements IteratorAggregate
         }
 
         foreach ($settings as $key => $value) {
-            $value = is_array($value) ? $value : [$value];
+            $value = [$value];
             call_user_func_array([$this, $key], $value);
         }
 

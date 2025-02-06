@@ -1,5 +1,6 @@
 <?php
 
+use Auth\User;
 use HttpSoft\Runner\MiddlewarePipelineInterface;
 use HttpSoft\Runner\MiddlewarePipeline;
 use HttpSoft\Runner\MiddlewareResolver;
@@ -25,6 +26,7 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Psr\Http\Server\RequestHandlerInterface;
+use Sys\Contract\UserInterface;
 use Sys\PostProcess\PostProcessInterface;
 use Sys\PostProcess\PostProcess;
 use Sys\Template\TemplateFactory;
@@ -78,6 +80,8 @@ return [
 
     TemplateInterface::class => fn() => (new TemplateFactory())->create(),
     I18nModelInterface::class => fn() => new I18nModelFile(findPaths('i18n')),
+
+    UserInterface::class => User::class,
     
     // ProfilerModelInterface::class => fn(ContainerInterface $c) => $c->get(Mysql::class),
     // Profiler::class => fn(ContainerInterface $c)

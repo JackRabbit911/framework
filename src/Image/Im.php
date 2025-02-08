@@ -2,18 +2,29 @@
 
 namespace Sys\Image;
 
+use HttpSoft\Message\UploadedFile;
 use Nette\Utils\Image;
 
 class Im
 {
-    private Image $image;
-    private string $file;
-    private int $format;
+    public Image $image;
+    public string $file;
+    public string $ext;
+    public int $format;
 
-    public function __construct($file)
+    public function __construct(UploadedFile|string $file)
     {
-        $this->image = Image::fromFile($file, $format);
-        $this->file = $file;
+        if ($file instanceof UploadedFile) {
+            $str = $file->getStream()->getContents();
+            $this->image = Image::fromString($str, $format);
+            $this->file = $file->getClientFilename();
+            $this->file = strtolower(str_replace(' ', '_', $this->file));
+        } else {
+            $this->image = Image::fromFile($file, $format);
+            $this->file = $file;
+        }
+
+        $this->ext = Image::typeToExtension($format);
         $this->format = $format;
     }
 
@@ -35,6 +46,11 @@ class Im
     public function save($filepath = null, $quality = null, $imageType = null)
     {
         $filepath = $filepath ?: $this->file;
+
+        ['dirname' => $dir, 'filename' => $filename] = pathinfo($filepath);
+        $filepath = $dir . '/' . $filename . '.'
+            . Image::typeToExtension($this->format);
+
         $this->image->save($filepath, $quality, $imageType);
     }
 

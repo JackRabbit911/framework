@@ -3,9 +3,7 @@
 namespace Sys\Controller;
 
 use Az\Route\Route;
-use Sys\FileResponse;
-use Sys\Helper\ResponseType;
-use Sys\Exception\ExceptionResponseFactory;
+use Sys\Response\FileResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -13,13 +11,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 final class Media implements MiddlewareInterface
 {
-    private ExceptionResponseFactory $factory;
-
-    public function __construct(ExceptionResponseFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $params = $request->getAttribute(Route::class)->getParameters();
@@ -37,11 +28,10 @@ final class Media implements MiddlewareInterface
 
         if (!is_file($filename)) {
             $filename = APPPATH . $file;
-            // dd($filename);
         }
 
         if (!is_file($filename)) {
-            return $this->factory->createResponse(ResponseType::html, 404, 'File not found');
+            return $handler->handle($request);
         }
 
         return new FileResponse($filename, (integer) $lifetime);

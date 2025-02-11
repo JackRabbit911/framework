@@ -7,7 +7,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use Sys\Config\Config;
 use Sys\SimpleRequest;
 use HttpSoft\Emitter\SapiEmitter;
+use HttpSoft\Response\HtmlResponse;
 use Nette\Utils\Finder;
+use Psr\Http\Message\ResponseInterface;
 use Sys\Exception\ExceptionResponseFactory;
 use Sys\Helper\MimeNegotiator;
 use Sys\Helper\ResponseType;
@@ -257,7 +259,7 @@ function request($psr = false)
     return $request;
 }
 
-function view(string $view, array $params = []): string
+function view(string $view, array $params = []): ResponseInterface
 {
     static $tpl;
 
@@ -265,7 +267,8 @@ function view(string $view, array $params = []): string
         $tpl = container()->get(TemplateInterface::class);
     }
 
-    return $tpl->render($view, $params);
+    $str = $tpl->render($view, $params);
+    return new HtmlResponse($str);
 }
 
 function abort($code = 404)

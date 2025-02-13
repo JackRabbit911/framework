@@ -17,16 +17,19 @@ class Template implements TemplateInterface
         $this->ext = $ext;
     }
 
-    public function addGlobal($name, $value)
+    public function addGlobal($name, $value): self
     {
         $this->engine->addGlobal($name, $value);
+        return $this;
     }
 
-    public function addFunction(string $name, callable $callback): void
+    public function addFunction(string $name, callable $callback): self
     {
         if ($this->ext === 'twig') {
             $this->engine->addFunction(new TwigFunction($name, $callback));
         }
+
+        return $this;
     }
 
     public function getEngine()
@@ -37,6 +40,12 @@ class Template implements TemplateInterface
     public function path($path)
     {
         $this->path = trim($path, '/') . '/';
+    }
+
+    public function addPath($path, $namespace)
+    {
+        $this->engine->getLoader()->addPath($path, $namespace);
+        return $this;
     }
 
     public function render(string $view, array $params = []): string

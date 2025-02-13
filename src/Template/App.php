@@ -2,6 +2,7 @@
 
 namespace Sys\Template;
 
+use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use Sys\SimpleRequest;
 
@@ -100,5 +101,24 @@ class App
         $directives = implode(', ', $directives);
 
         return '<meta name="robots" content="' . $directives . '" />';
+    }
+
+    public function file($filepath)
+    {
+        $file = $filepath;
+
+        if (!is_file($file)) {
+            $file = STORAGE . $filepath;
+        }
+
+        if (!is_file($file)) {
+            $file = APPPATH . $filepath;
+        }
+
+        if (!is_file($file)) {
+            throw new Exception("File $filepath not found");
+        }
+
+        return file_get_contents($file);
     }
 }

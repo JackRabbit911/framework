@@ -32,6 +32,13 @@ final class Text extends Transliterator
         return ucwords($string, '\\');
     }
 
+    public function strToSlug($string, $separator = '-')
+    {
+        $search = [',', ' '];
+        $replace = ['', $separator];
+        return strtolower(str_replace($search, $replace, $string));
+    }
+
     private function dashesToCamelCase($string, $separator, $capitalizeFirstCharacter = false) 
     {
         $str = str_replace($separator, '', ucwords($string, $separator));

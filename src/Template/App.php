@@ -4,6 +4,7 @@ namespace Sys\Template;
 
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
+use Sys\Helper\Facade\Text;
 use Sys\SimpleRequest;
 
 class App
@@ -58,6 +59,18 @@ class App
     public function form($instance)
     {
         return $instance;
+    }
+
+    public function uri()
+    {
+        return $_SERVER['REQUEST_URI'] ?? $_SERVER['PATH_INFO'] ?? '';
+    }
+
+    public function is_active($string, $strong = true): bool
+    {
+        return ($strong)
+            ? $this->uri() === $string
+            : str_contains($this->uri(), Text::strToSlug($string));
     }
 
     public function request()

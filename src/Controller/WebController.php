@@ -32,7 +32,7 @@ abstract class WebController extends BaseController
         $this->i18n = $request->getAttribute('i18n');
 
         if (isset($this->i18n)) {
-            $this->tpl->addGlobal('lang', $this->i18n->lang());
+            $this->tpl->addGlobal('i18n', $this->i18n);
         }
 
         $this->tpl->addFunction('__', function ($string, $values = null) {

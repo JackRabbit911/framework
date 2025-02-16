@@ -259,7 +259,7 @@ function request($psr = false)
     return $request;
 }
 
-function view(string $view, array $params = []): ResponseInterface
+function view(string $view, array $params = [], bool $is_response = false): string|ResponseInterface
 {
     static $tpl;
 
@@ -268,7 +268,7 @@ function view(string $view, array $params = []): ResponseInterface
     }
 
     $str = $tpl->render($view, $params);
-    return new HtmlResponse($str);
+    return ($is_response) ? new HtmlResponse($str) : $str;
 }
 
 function abort($code = 404)

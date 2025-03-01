@@ -8,6 +8,8 @@ use ArrayIterator;
 use IteratorAggregate;
 use Traversable;
 use Exception;
+use JSON_UNESCAPED_SLASHES;
+use JSON_UNESCAPED_UNICODE;
 
 class Email implements IteratorAggregate
 {

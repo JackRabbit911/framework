@@ -6,6 +6,7 @@ use Psr\Http\Message\ResponseInterface;
 use Sys\Model\CommitListener;
 use Sys\Profiler\Profiler;
 use SplObjectStorage;
+use IS_DEBUG;
 
 class PostProcess implements PostProcessInterface
 {

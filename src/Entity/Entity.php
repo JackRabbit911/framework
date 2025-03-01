@@ -6,6 +6,7 @@ use Exception;
 use JsonSerializable;
 use Sys\Model\CommitListener;
 use Sys\Trait\ToArray;
+use DISPLAY_ERRORS;
 
 abstract class Entity implements JsonSerializable
 {

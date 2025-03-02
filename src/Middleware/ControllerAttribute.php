@@ -15,16 +15,16 @@ use ReflectionFunction;
 use ReflectionMethod;
 use Sys\Observer\Interface\Listener;
 use Sys\Observer\Interface\Observer;
-use Sys\PostProcess\PostProcess;
-use TypeError;
+use Sys\PostProcess\PostProcessInterface;
+use Throwable;
 
 final class ControllerAttribute implements MiddlewareInterface
 {
     private ContainerInterface $container;
     private MiddlewarePipelineInterface $pipeline;
-    private PostProcess $postProcess;
+    private PostProcessInterface $postProcess;
 
-    public function __construct(ContainerInterface $container, PostProcess $post_process)
+    public function __construct(ContainerInterface $container, PostProcessInterface $post_process)
     {
         $this->container = $container;
         $this->pipeline = new MiddlewarePipeline();
@@ -50,7 +50,7 @@ final class ControllerAttribute implements MiddlewareInterface
 
             try {
                 $instance = $attr->newInstance();              
-            } catch (TypeError $e) {
+            } catch (Throwable $e) {
                 $args = $attr->getArguments();
                 $args['_class'] = $routeHandler[0] ?? $routeHandler;
                 $instance = $this->container->make($attr->getName(), $args);

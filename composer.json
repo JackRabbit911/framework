@@ -31,7 +31,8 @@
         "phpmailer/phpmailer": "^6.8",
         "symfony/process": "^6.3",
         "guzzlehttp/guzzle": "^7.8",
-        "nette/utils": "^4.0"
+        "nette/utils": "^4.0",
+        "firebase/php-jwt": "^6.11"
     },
     "autoload": {
         "psr-4": {

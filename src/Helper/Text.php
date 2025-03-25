@@ -39,6 +39,13 @@ final class Text extends Transliterator
         return strtolower(str_replace($search, $replace, $string));
     }
 
+    public function catStr($str, $count_words)
+    {
+        $array = explode(' ', $str, $count_words);
+        unset($array[array_key_last($array)]);
+        return implode(' ', $array);
+    }
+
     private function dashesToCamelCase($string, $separator, $capitalizeFirstCharacter = false) 
     {
         $str = str_replace($separator, '', ucwords($string, $separator));

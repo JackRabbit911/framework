@@ -98,7 +98,7 @@ class App
 
         $scripts = array_map(fn($v) => '<script src="' . $v . '"></script>', array_unique($this->scripts));
 
-        return implode('<br>', $scripts);
+        return implode(PHP_EOL, $scripts);
     }
 
     public function robots(...$directives)

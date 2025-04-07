@@ -41,7 +41,11 @@ final class Text extends Transliterator
 
     public function catStr($str, $count_words)
     {
-        $array = explode(' ', $str, $count_words);
+        if (str_word_count($str) <= $count_words) {
+            return $str;
+        }
+
+        $array = explode(' ', $str, $count_words + 1);
         unset($array[array_key_last($array)]);
         return implode(' ', $array);
     }

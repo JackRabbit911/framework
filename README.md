@@ -15,4 +15,4 @@ Simple lightweight modern component psr compatible PHP framework
 - QueryBuilder
 - And others...
 ## Usage
-see UserGuide
+see [UserGuide](https://github.com/JackRabbit911/app-skeleton)

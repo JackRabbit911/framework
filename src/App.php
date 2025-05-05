@@ -40,7 +40,7 @@ final class App
         $setErrorHandler;
     }
 
-    public function pipe($middleware, string $path = null): void
+    public function pipe($middleware, ?string $path = null): void
     {
         $this->pipeline->pipe($this->resolver->resolve($middleware), $path);
     }

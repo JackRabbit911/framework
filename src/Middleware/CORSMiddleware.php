@@ -8,6 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Sys\Response\ResponseHeader;
 
 #[Attribute]
 class CORSMiddleware implements MiddlewareInterface
@@ -19,10 +20,13 @@ class CORSMiddleware implements MiddlewareInterface
         $contract = config('api_contracts', $request->getUri()->getPath());
         define('API_ALLOW_METHODS', $contract['methods']);
 
-        if ($request->getMethod() === 'OPTIONS') {
-            $headers = $this->getHeaders($request,$contract);
+        $headers = $this->getHeaders($request,$contract);
+        ResponseHeader::addHeaders($headers);
 
-            return new EmptyResponse(204, $headers);
+        if ($request->getMethod() === 'OPTIONS') {
+            // $headers = $this->getHeaders($request,$contract);
+
+            return new EmptyResponse(204);
         }
 
         return $handler->handle($request);

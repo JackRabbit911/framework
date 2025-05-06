@@ -32,9 +32,6 @@ abstract class ApiController implements RequestHandlerInterface// extends BaseCo
         $response = $this->call($action, $this->parameters);
 
         if (!$response instanceof ResponseInterface) {
-            // $cors = container()->get(CORSMiddleware::class);
-            // $contract = config('api_contracts', $request->getUri()->getPath());
-            // $headers = $cors->getHeaders($request, $contract);
             $response = new JsonResponse($response, 200);
         }
 

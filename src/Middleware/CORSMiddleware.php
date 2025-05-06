@@ -24,8 +24,6 @@ class CORSMiddleware implements MiddlewareInterface
         ResponseHeader::addHeaders($headers);
 
         if ($request->getMethod() === 'OPTIONS') {
-            // $headers = $this->getHeaders($request,$contract);
-
             return new EmptyResponse(204);
         }
 

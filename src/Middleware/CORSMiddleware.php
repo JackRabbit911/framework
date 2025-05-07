@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Sys\Middleware;
 
@@ -15,12 +17,12 @@ class CORSMiddleware implements MiddlewareInterface
 {
     public function process(
         ServerRequestInterface $request,
-        RequestHandlerInterface $handler): ResponseInterface
-    {
-        $contract = config('api_contracts', $request->getUri()->getPath());
+        RequestHandlerInterface $handler
+    ): ResponseInterface {
+        $contract = config('api_contracts');
         define('API_ALLOW_METHODS', $contract['methods']);
 
-        $headers = $this->getHeaders($request,$contract);
+        $headers = $this->getHeaders($request, $contract);
         ResponseHeader::addHeaders($headers);
 
         if ($request->getMethod() === 'OPTIONS') {
@@ -33,26 +35,32 @@ class CORSMiddleware implements MiddlewareInterface
     public function getHeaders($request, $contract)
     {
         $allow_headers = implode(',', $contract['headers']);
-        $allow_methods = strtoupper(implode(',', $contract['methods']));
+        $allow_methods = array_map(fn($v) => strtoupper($v), $contract['methods']);
 
-        $origin = (in_array($request->getHeaderLine('Origin'), $contract['hosts']))
-            ?  $request->getHeaderLine('Origin') : '';
+        $method = $request->getMethod();
+        $method = (in_array($method, $allow_methods)) ? $method : null;
 
-            $headers = [
-                'Access-Control-Allow-Origin' => $origin,
-                'Access-Control-Allow-Methods' => $allow_methods,
-                'Access-Control-Allow-Headers' => $allow_headers,
-            ];
+        $headers = [
+            'Access-Control-Allow-Headers' => $allow_headers,
+            'Access-Control-Expose-Headers' => $allow_headers,
+        ];
 
-            if (isset($contract['max_age'])) {
-                $headers['Access-Control-Max-Age'] = $contract['max_age'];
-            }
+        if (in_array($request->getHeaderLine('Origin'), $contract['hosts'])) {
+            $headers['Access-Control-Allow-Origin'] = $request->getHeaderLine('Origin');
+        }
 
-            if (isset($contract['allow_credentials']) && $contract['allow_credentials'] === true)
-            {
-                $headers['Access-Control-Allow-Credentials'] = 'true';
-            }
+        if (isset($method)) {
+            $headers['Access-Control-Allow-Methods'] = $method;
+        }
 
-            return $headers;
+        if (isset($contract['max_age'])) {
+            $headers['Access-Control-Max-Age'] = $contract['max_age'];
+        }
+
+        if (isset($contract['allow_credentials']) && $contract['allow_credentials'] === true) {
+            $headers['Access-Control-Allow-Credentials'] = 'true';
+        }
+
+        return $headers;
     }
 }

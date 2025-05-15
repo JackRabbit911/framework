@@ -26,10 +26,9 @@ class Template implements TemplateInterface
 
     public function addFunction(string $name, callable $callback): self
     {
-        $this->functions[] = $name;
-
         if ($this->ext === 'twig' && !in_array($name, $this->functions)) {
             $this->engine->addFunction(new TwigFunction($name, $callback));
+            $this->functions[] = $name;
         }
 
         return $this;

@@ -11,21 +11,23 @@ use Sys\Helper\ResponseType;
 
 class DefaultHandler implements RequestHandlerInterface
 {
-    private $factory;
-
-    public function __construct(ExceptionResponseFactory $factory, ?ResponseType $responseType = null)
-    {
-        $this->factory = $factory;
-    }
+    public function __construct(
+        private ExceptionResponseFactory $factory,
+        private ?ResponseType $responseType = null){}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $headers = $request->getAttribute('headers');
         $status_code = $request->getAttribute('status_code') ?? 404;
         $accept_header = $request->getHeaderLine('Accept');
-        $mimeNegotiator = new MimeNegotiator($accept_header);
-        $response_type = $mimeNegotiator->getResponseType();
-        $response_type = ResponseType::from($response_type);
+
+        if (!$this->responseType) {
+            $mimeNegotiator = new MimeNegotiator($accept_header);
+            $response_type = $mimeNegotiator->getResponseType();
+            $response_type = ResponseType::from($response_type);
+        } else {
+            $response_type = $this->responseType;
+        }
 
         $response = $this->factory->createResponse($response_type, $status_code);
 

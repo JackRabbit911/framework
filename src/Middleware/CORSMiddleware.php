@@ -36,9 +36,7 @@ class CORSMiddleware implements MiddlewareInterface
     {
         $allow_headers = implode(',', $contract['headers']);
         $allow_methods = array_map(fn($v) => strtoupper($v), $contract['methods']);
-
-        $method = $request->getMethod();
-        $method = (in_array($method, $allow_methods)) ? $method : null;
+        $allow_methods = implode(',', $allow_methods);
 
         $headers = [
             'Access-Control-Allow-Headers' => $allow_headers,
@@ -49,9 +47,7 @@ class CORSMiddleware implements MiddlewareInterface
             $headers['Access-Control-Allow-Origin'] = $request->getHeaderLine('Origin');
         }
 
-        if (isset($method)) {
-            $headers['Access-Control-Allow-Methods'] = $method;
-        }
+        $headers['Access-Control-Allow-Methods'] = $allow_methods;
 
         if (isset($contract['max_age'])) {
             $headers['Access-Control-Max-Age'] = $contract['max_age'];

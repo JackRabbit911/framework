@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Sys\InternalRequest;
+namespace Sys\Request\Internal;
 
 use Sys\Exception\HttpExceptionInterface;
 use Sys\Helper\MimeNegotiator;

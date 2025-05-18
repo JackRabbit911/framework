@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Sys\InternalRequest;
+namespace Sys\Request\Internal;
 
 use HttpSoft\Message\ServerRequest;
 use HttpSoft\ServerRequest\PhpInputStream;

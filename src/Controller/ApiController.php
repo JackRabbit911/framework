@@ -9,6 +9,7 @@ use Az\Route\Route;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Sys\I18n\I18n;
 
 abstract class ApiController implements RequestHandlerInterface// extends BaseController
 {
@@ -18,6 +19,7 @@ abstract class ApiController implements RequestHandlerInterface// extends BaseCo
     protected array $parameters;
     protected array $headers;
     protected ?UserInterface $user;
+    protected I18n $i18n;
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -25,6 +27,7 @@ abstract class ApiController implements RequestHandlerInterface// extends BaseCo
         $route = $request->getAttribute(Route::class);
         $this->parameters = $route->getParameters();
         $this->user = $request->getAttribute('user');
+        $this->i18n = $request->getAttribute('i18n');
 
         [$handler, $action] = $route->getHandler();
 

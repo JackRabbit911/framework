@@ -20,7 +20,9 @@ final class I18n
     private int $index = 0;
     private bool $needInsertSegment = false;
 
-    public function __construct(ServerRequestInterface $request, I18nModelInterface $model)
+    public function __construct(
+        ServerRequestInterface $request,
+        I18nModelInterface $model, mixed $config = null)
     {
         $this->options();
         $this->lang = $this->detectLang($request);
@@ -46,7 +48,7 @@ final class I18n
         return array_key_first($this->langs) ?? 'en';
     }
 
-    public function gettext(string $string, array $values = null): string
+    public function gettext(string $string, ?array $values = null): string
     {
         $string = $this->model->get($this->lang, $string);
         return ($values) ? strtr($string, $values) : $string;

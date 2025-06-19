@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Sys\PostProcess;
+namespace Sys\Pipeline;
 
 use Psr\Http\Message\ResponseInterface;
 

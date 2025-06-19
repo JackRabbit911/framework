@@ -7,13 +7,18 @@ namespace Sys\Pipeline;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class PostProcess
+class PostProcess implements PostProcessInterface
 {
     private array $handlers = [];
 
-    public function __construct(private ContainerInterface $container){}
+    public function __construct(private ContainerInterface $container)
+    {
+        foreach (config('post_process') ?? [] as $class) {
+            $this->enqueue($class);
+        }
+    }
 
-    public function enqueue(string|object $class): object
+    public function enqueue(string|object $class): self
     {
         $handler = is_string($class) ? $this->container->get($class) : $class;
 
@@ -21,7 +26,7 @@ class PostProcess
             $this->handlers[] = $handler;
         }
 
-        return $handler;
+        return $this;
     }
 
     public function process(ResponseInterface $response): ResponseInterface

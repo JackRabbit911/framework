@@ -8,7 +8,5 @@ interface PostProcessInterface
 {
     public function process(ResponseInterface $response): ResponseInterface;
 
-    public function enqueue(object $object);
-
-    public function config(array|string $config): self;
+    public function enqueue(object $object): self;
 }

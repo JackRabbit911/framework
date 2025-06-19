@@ -1,10 +1,6 @@
 <?php
 
 use Auth\User;
-use HttpSoft\Runner\MiddlewarePipelineInterface;
-use HttpSoft\Runner\MiddlewarePipeline;
-use HttpSoft\Runner\MiddlewareResolver;
-use HttpSoft\Runner\MiddlewareResolverInterface;
 use HttpSoft\ServerRequest\ServerRequestCreator;
 use HttpSoft\Emitter\EmitterInterface;
 use HttpSoft\Emitter\SapiEmitter;
@@ -33,6 +29,8 @@ use Sys\Template\TemplateFactory;
 use Sys\Template\TemplateInterface;
 use Sys\I18n\Model\File as I18nModelFile;
 use Sys\I18n\Model\I18nModelInterface;
+use Sys\Pipeline\Pipeline;
+use Sys\Pipeline\PipelineInterface;
 use Sys\Profiler\Model\Mysql;
 use Sys\Profiler\Model\ProfilerModelInterface;
 use Sys\Profiler\Profiler;
@@ -41,8 +39,7 @@ return [
     ServerRequestInterface::class => fn() => (new ServerRequestCreator())->create(),
     RequestHandlerInterface::class => fn(ExceptionResponseFactory $factory) => new DefaultHandler($factory),
     RouterInterface::class => fn() => new Router(ROUTE_PATHS),
-    MiddlewarePipelineInterface::class => fn() => new MiddlewarePipeline(),
-    MiddlewareResolverInterface::class => fn(ContainerInterface $c) => new MiddlewareResolver($c),
+    PipelineInterface::class => fn(ContainerInterface $c) => new Pipeline($c),
     EmitterInterface::class => fn() => new SapiEmitter,
     LoggerInterface::class => function () {
         $logger = new Logger('e');

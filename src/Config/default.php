@@ -6,6 +6,7 @@ use Sys\I18n\I18nMiddleware;
 use Sys\Middleware\ControllerAttribute;
 use Sys\Service\Robots;
 use Sys\Model\CommitListener;
+use Sys\Response\ResponseHeader;
 
 return [
     'common' => [
@@ -35,8 +36,8 @@ return [
         'from_name' => env('MAIL_FROM_NAME'),
     ],
     'post_process' => [
-            Robots::class,
-            CommitListener::class,
+        CommitListener::class,
+        ResponseHeader::class,
     ],
     'session' => [
         'cookie' => [

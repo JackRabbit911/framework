@@ -9,8 +9,9 @@ use Sys\Model\Interface\Saveble;
 use ReflectionObject;
 use ReflectionAttribute;
 use SplObjectStorage;
+use Sys\Pipeline\PostProccessHandlerInterface;
 
-final class CommitListener
+final class CommitListener implements PostProccessHandlerInterface
 {
     private static SplObjectStorage $storage;
     private ContainerInterface $container;

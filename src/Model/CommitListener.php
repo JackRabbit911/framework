@@ -4,6 +4,7 @@ namespace Sys\Model;
 
 use Exception;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
 use Sys\Model\Interface\Saveble;
 use ReflectionObject;
 use ReflectionAttribute;
@@ -32,7 +33,7 @@ final class CommitListener
         self::$storage->attach($entity, $model);
     }
 
-    public function handle()
+    public function handle(ResponseInterface $response): ResponseInterface
     {
         $saveProvider = config('saverProvider');
 
@@ -53,6 +54,8 @@ final class CommitListener
             
             $model->save($entity);
         }
+        
+        return $response;
     }
 
     private function getByAttribute($entity)

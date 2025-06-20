@@ -1,10 +1,6 @@
 <?php
 
 use Auth\User;
-use HttpSoft\Runner\MiddlewarePipelineInterface;
-use HttpSoft\Runner\MiddlewarePipeline;
-use HttpSoft\Runner\MiddlewareResolver;
-use HttpSoft\Runner\MiddlewareResolverInterface;
 use HttpSoft\ServerRequest\ServerRequestCreator;
 use HttpSoft\Emitter\EmitterInterface;
 use HttpSoft\Emitter\SapiEmitter;
@@ -27,22 +23,20 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Psr\Http\Server\RequestHandlerInterface;
 use Sys\Contract\UserInterface;
-use Sys\PostProcess\PostProcessInterface;
-use Sys\PostProcess\PostProcess;
 use Sys\Template\TemplateFactory;
 use Sys\Template\TemplateInterface;
 use Sys\I18n\Model\File as I18nModelFile;
 use Sys\I18n\Model\I18nModelInterface;
-use Sys\Profiler\Model\Mysql;
-use Sys\Profiler\Model\ProfilerModelInterface;
-use Sys\Profiler\Profiler;
+use Sys\Pipeline\Pipeline;
+use Sys\Pipeline\PipelineInterface;
+use Sys\Pipeline\PostProcess;
+use Sys\Pipeline\PostProcessInterface;
 
 return [
     ServerRequestInterface::class => fn() => (new ServerRequestCreator())->create(),
     RequestHandlerInterface::class => fn(ExceptionResponseFactory $factory) => new DefaultHandler($factory),
     RouterInterface::class => fn() => new Router(ROUTE_PATHS),
-    MiddlewarePipelineInterface::class => fn() => new MiddlewarePipeline(),
-    MiddlewareResolverInterface::class => fn(ContainerInterface $c) => new MiddlewareResolver($c),
+    PipelineInterface::class => fn(ContainerInterface $c) => new Pipeline($c),
     EmitterInterface::class => fn() => new SapiEmitter,
     LoggerInterface::class => function () {
         $logger = new Logger('e');
@@ -62,7 +56,7 @@ return [
         ExceptionResponseFactory $response_factory) 
         => new WhoopsAdapter($request, $logger, $emitter, $response_factory),
     
-    PostProcessInterface::class => fn() => new PostProcess(),
+    PostProcessInterface::class => fn(ContainerInterface $c) => new PostProcess($c),
     IQueryBuilderHandler::class => fn() => (new Connection('mysql', config('database', 'connect.mysql')))->getQueryBuilder(),
     
     SessionInterface::class => function (ContainerInterface $c) {
@@ -82,8 +76,4 @@ return [
     I18nModelInterface::class => fn() => new I18nModelFile(findPaths('i18n')),
 
     UserInterface::class => User::class,
-    
-    // ProfilerModelInterface::class => fn(ContainerInterface $c) => $c->get(Mysql::class),
-    // Profiler::class => fn(ContainerInterface $c)
-    //     => new Profiler($c->get(ProfilerModelInterface::class), $c->get(RouteCollectionInterface::class)),
 ];

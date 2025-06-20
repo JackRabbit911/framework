@@ -1,48 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sys;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use HttpSoft\Runner\MiddlewarePipelineInterface;
-use HttpSoft\Runner\MiddlewareResolverInterface;
 use HttpSoft\Emitter\EmitterInterface;
 use Sys\Exception\SetErrorHandlerInterface;
-use Sys\PostProcess\PostProcessInterface;
+use Sys\Pipeline\PipelineInterface;
+use Sys\Pipeline\PostProcessInterface;
 
-final class App
+class App
 {
     private const NO_BODY_RESPONSE_CODES = [100, 101, 102, 204, 205, 304];
 
-    private ServerRequestInterface $request;
-    private MiddlewarePipelineInterface $pipeline;
-    private MiddlewareResolverInterface $resolver;
-    private RequestHandlerInterface $defaultHandler;
-    private EmitterInterface $emitter;
-    private PostProcessInterface $postProcess;
-
     public function __construct(
-        ServerRequestInterface $request,
-        MiddlewarePipelineInterface $pipeline,
-        MiddlewareResolverInterface $resolver,    
-        EmitterInterface $emitter,
-        SetErrorHandlerInterface $setErrorHandler,
-        RequestHandlerInterface $defaultHandler,
-        PostProcessInterface $postProcess,
+        private ServerRequestInterface $request,
+        private PipelineInterface $pipeline,
+        private EmitterInterface $emitter,
+        private SetErrorHandlerInterface $setErrorHandler,
+        private RequestHandlerInterface $defaultHandler,
+        private PostProcessInterface $postProcess
     )
     {
-        $this->request = $request;
-        $this->pipeline = $pipeline;
-        $this->resolver = $resolver;
-        $this->emitter = $emitter;
-        $this->defaultHandler = $defaultHandler;
-        $this->postProcess = $postProcess;
         $setErrorHandler;
     }
 
     public function pipe($middleware, ?string $path = null): void
     {
-        $this->pipeline->pipe($this->resolver->resolve($middleware), $path);
+        $this->pipeline->pipe($middleware);
     }
 
     public function run(): void
@@ -57,9 +44,7 @@ final class App
         $response = $this->pipeline
             ->process($this->request, $this->defaultHandler);
             
-        $response = $this->postProcess
-            ->config('post_process')
-            ->process($response);
+        $response = $this->postProcess->process($response);
 
         $this->emitter->emit($response, $this->isResponseWithoutBody(
             (string) request()->getMethod(),

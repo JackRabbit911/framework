@@ -2,33 +2,31 @@
 
 namespace Sys\Middleware;
 
+use Sys\Observer\Interface\ObserverInterface;
+use Sys\Pipeline\Pipeline;
+use Sys\Pipeline\PostProcessInterface;
+use Az\Route\Route;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Az\Route\Route;
-use HttpSoft\Runner\MiddlewarePipeline;
-use HttpSoft\Runner\MiddlewarePipelineInterface;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionFunction;
 use ReflectionMethod;
-use Sys\Observer\Interface\Listener;
-use Sys\Observer\Interface\Observer;
-use Sys\PostProcess\PostProcessInterface;
-use Throwable;
+use Error;
+
 
 final class ControllerAttribute implements MiddlewareInterface
 {
-    private ContainerInterface $container;
-    private MiddlewarePipelineInterface $pipeline;
-    private PostProcessInterface $postProcess;
+    private Pipeline $pipeline;
 
-    public function __construct(ContainerInterface $container, PostProcessInterface $post_process)
+    public function __construct(
+        private ContainerInterface $container,
+        private PostProcessInterface $postProcess
+    )
     {
-        $this->container = $container;
-        $this->pipeline = new MiddlewarePipeline();
-        $this->postProcess = $post_process;
+        $this->pipeline = new Pipeline($container);
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -50,9 +48,8 @@ final class ControllerAttribute implements MiddlewareInterface
 
             try {
                 $instance = $attr->newInstance();              
-            } catch (Throwable $e) {
+            } catch (Error $e) {
                 $args = $attr->getArguments();
-                $args['_class'] = $routeHandler[0] ?? $routeHandler;
                 $instance = $this->container->make($attr->getName(), $args);
             }
 
@@ -66,8 +63,9 @@ final class ControllerAttribute implements MiddlewareInterface
     {
         match (true) {
             ($instance instanceof MiddlewareInterface) => $this->pipeline->pipe($instance),
-            ($instance instanceof Observer) => $this->postProcess->enqueue($instance->update($controller)),
-            ($instance instanceof Listener) => $this->postProcess->enqueue($instance),
+            ($instance instanceof ObserverInterface) => $this->postProcess
+                ->enqueue($instance)->update($controller),
+            ($instance instanceof PostProcessInterface) => $this->postProcess->enqueue($instance),
         };
     }
 

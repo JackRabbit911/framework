@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Sys\Response;
 
-use Sys\PostProcess\PostProccessHandlerInterface;
+use Sys\Pipeline\PostProccessHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class ResponseHeader implements PostProccessHandlerInterface

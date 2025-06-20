@@ -31,7 +31,8 @@ final class File
             }
         }
 
-        return $result ?: $this->default($file);
+        $default = $this->default($file) ?? [];
+        $result = array_merge($default, $result);
 
         return (empty($result)) ? null : $result;
     }
@@ -45,8 +46,12 @@ final class File
         }
 
         $file = __DIR__ . '/default.php';
-        $default = require_once $file;
 
-        return $default[$key] ?? null;
+        if (is_file($file)) {
+            $default = require_once $file;
+            return $default[$key] ?? [];
+        }
+
+        return [];
     }
 }

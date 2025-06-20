@@ -19,7 +19,7 @@ class CORSMiddleware implements MiddlewareInterface
         ServerRequestInterface $request,
         RequestHandlerInterface $handler
     ): ResponseInterface {
-        $contract = config('api_contracts');
+        $contract = config('api_contract');
         define('API_ALLOW_METHODS', $contract['methods']);
 
         $headers = $this->getHeaders($request, $contract);

@@ -15,16 +15,17 @@ class Pipeline implements PipelineInterface
 
     public function __construct(private ContainerInterface $container){}
 
-    public function pipe(string|object|array $middlewareClass): void
+    public function pipe(string|object|array $middleware): void
     {
-        if (is_array($middlewareClass)) {
-            foreach ($middlewareClass as $item) {
+        if (is_array($middleware)) {
+            foreach ($middleware as $item) {
                 $this->pipe($item);
             }
+        } elseif (is_string($middleware)) {
+            $this->pipeline[] = $this->container->get($middleware);
+        } else {
+            $this->pipeline[] = $middleware;
         }
-        
-        $this->pipeline[] = (is_string($middlewareClass))
-            ? $this->container->get($middlewareClass) : $middlewareClass;
     }
 
     public function process(
@@ -48,6 +49,9 @@ class Pipeline implements PipelineInterface
                 }
 
                 $next = clone $this;
+                if (is_array($middleware)) {
+                    dd($middleware);
+                }
                 return $middleware->process($request, $next);
             }
         };

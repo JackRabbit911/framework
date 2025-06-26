@@ -288,3 +288,12 @@ function redirect($url, $code = 302)
     header('Location: ' . $url, true, $code);
     exit;
 }
+
+function logger(?string $content, string $file = 'log.txt'):void
+{
+    if ($content) {
+        $prefix = STORAGE . 'logs/';
+        $file = $prefix . $file;
+        file_put_contents($file, $content, FILE_APPEND);
+    }
+}

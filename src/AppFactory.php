@@ -1,14 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sys;
 
 use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
 
-final class ContainerFactory
+class AppFactory
 {
-    public function create(ContainerBuilder $builder): ContainerInterface
+    public static function create(): App
     {
+        $container = self::getContainer();
+        return $container->get(App::class);
+    }
+
+    private static function getContainer(): ContainerInterface
+    {
+        $builder = new ContainerBuilder();
         $builder->useAttributes(true);
 
         $files = [
@@ -33,6 +42,8 @@ final class ContainerFactory
             $builder->enableCompilation(STORAGE . 'cache');
         }
 
-        return $builder->build();
+        $GLOBALS['container'] = $builder->build();
+
+        return $GLOBALS['container'];
     }
 }

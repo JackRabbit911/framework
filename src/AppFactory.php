@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sys;
 
+use Sys\Console\App as Console;
 use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
 
@@ -15,13 +16,19 @@ class AppFactory
         return $container->get(App::class);
     }
 
+    public static function console(): Console
+    {
+        $container = self::getContainer();
+        return $container->get(Console::class);
+    }
+
     private static function getContainer(): ContainerInterface
     {
         $builder = new ContainerBuilder();
         $builder->useAttributes(true);
 
         $files = [
-            __DIR__ . '/Config/container.php',
+            FRAMEWORK . 'Config/container.php',
             CONFIG . 'container/common.php',
             CONFIG . 'container/' . MODE . '.php',
         ];

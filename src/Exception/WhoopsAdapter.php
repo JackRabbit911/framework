@@ -105,19 +105,6 @@ final class WhoopsAdapter implements SetErrorHandlerInterface
         });
     }
 
-    private function pushRollbackHandler(Whoops $whoops)
-    {
-        $whoops->pushHandler(function ($exception, $inspector, $run) {
-            try {
-                rename(ROOTPATH . 'app', ROOTPATH . 'error');
-                rename(ROOTPATH . 'backup', ROOTPATH . 'app');
-                header("Refresh: 2");
-            } catch (\ErrorException $e) {
-                header("Refresh: 2");
-            }
-        });
-    }
-
     private function setEditor(PrettyPageHandler $handler)
     {
         $handler->setEditor(function ($file, $line) {

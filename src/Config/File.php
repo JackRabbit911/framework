@@ -32,7 +32,12 @@ final class File
         }
 
         $default = $this->default($file) ?? [];
-        $result = array_merge($default, $result);
+
+        if (array_is_list($result)) {
+            $result = array_merge($default, $result);
+        } else {
+            $result = array_replace_recursive($default, $result);
+        }
 
         return (empty($result)) ? null : $result;
     }

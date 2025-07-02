@@ -16,13 +16,7 @@ class AppFactory
         return $container->get(App::class);
     }
 
-    public static function console(): Console
-    {
-        $container = self::getContainer();
-        return $container->get(Console::class);
-    }
-
-    private static function getContainer(): ContainerInterface
+    public static function getContainer(): ContainerInterface
     {
         $builder = new ContainerBuilder();
         $builder->useAttributes(true);

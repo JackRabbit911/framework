@@ -18,7 +18,7 @@ abstract class ApiController implements RequestHandlerInterface// extends BaseCo
     protected ServerRequestInterface $request;
     protected array $parameters;
     protected array $headers;
-    protected ?UserInterface $user;
+    protected $user;
     protected I18n $i18n;
 
     public function handle(ServerRequestInterface $request): ResponseInterface

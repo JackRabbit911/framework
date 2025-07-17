@@ -24,10 +24,10 @@ class Test extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $namesapace = $input->getArgument('namespace') ?? 'app';
-        $test_path = config('test_paths', $namesapace);
+        $namespace = $input->getArgument('namespace') ?? 'app';
+        $test_path = config('test_paths', $namespace);
 
-        passthru('./vendor/phpunit/phpunit/phpunit ' . $test_path);
+        passthru('../system/vendor/phpunit/phpunit/phpunit ' . $test_path);
         return Command::SUCCESS;
     }
 }

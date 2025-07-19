@@ -62,15 +62,15 @@ function container()
 
 function config(string $file, ?string $path = null, $default = null, $cache = null)
 {
-    $config = container()->get(Config::class);
-    $is_cache = $config->getEnabled();
+    $config = container()?->get(Config::class);
+    $is_cache = $config?->getEnabled();
 
     if (isset($cache)) {
         $config->enable($cache);
     }
     
-    $result = $config->get($file, $path, $default);
-    $config->enable($is_cache);
+    $result = $config?->get($file, $path, $default);
+    $config?->enable($is_cache);
     return $result;
 }
 

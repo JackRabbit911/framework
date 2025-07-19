@@ -2,7 +2,7 @@
 
 namespace Sys\Config;
 
-final class Config
+class Config
 {
     private array $paths = [CONFIG];
     private Cache $cache;

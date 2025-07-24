@@ -33,7 +33,8 @@
         "guzzlehttp/guzzle": "^7.8",
         "nette/utils": "^4.0",
         "firebase/php-jwt": "^6.11",
-        "symfony/console": "^7.3"
+        "symfony/console": "^7.3",
+        "workerman/workerman": "^5.1"
     },
     "autoload": {
         "psr-4": {

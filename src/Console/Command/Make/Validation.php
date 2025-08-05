@@ -10,7 +10,6 @@ use Symfony\Component\Console\Input\InputArgument;
 #[AsCommand(name: 'make:validation', aliases: ['mk:valid'])]
 class Validation extends MakeAbstract
 {
-    protected string $folder = 'middleware';
     protected string $blank = 'validation';
 
     protected function configure(): void

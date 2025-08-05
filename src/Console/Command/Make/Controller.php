@@ -10,7 +10,6 @@ use Symfony\Component\Console\Input\InputArgument;
 #[AsCommand(name: 'make:controller', aliases: ['mk:ctrl'])]
 class Controller extends MakeAbstract
 {
-    protected string $folder = 'controller';
     protected string $blank = 'controller';
 
     protected function configure(): void

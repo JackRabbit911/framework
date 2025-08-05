@@ -8,7 +8,7 @@ class CreateClass
 {
     const NO_BLANK = 1;
     const NO_DIR = 2;
-    const DIR = APPPATH . 'migrations/';
+    const DIR = APPPATH . 'common/migrations/';
 
     public function create(string $table, string $action = 'create')
     {

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Symfony\Component\Console\Command\Command;
+use Sys\Console\Command\Clear\Session;
 use Sys\Console\Command\Database\Migrate;
 use Sys\Console\Command\Do\Unittest;
 use Sys\Console\Command\Make\Controller;
@@ -38,6 +39,8 @@ return [
 
     'db:migrate' => static fn(): Command => container()->get(Migrate::class),
     'db:mgrt' => static fn(): Command => container()->get(Migrate::class),
+
+    'clear:sess' => static fn(): Command => container()->get(Session::class),
 
     'do:test' => static fn(): Command => container()->get(Unittest::class),
 ];

@@ -4,6 +4,8 @@ use Auth\User;
 use HttpSoft\ServerRequest\ServerRequestCreator;
 use HttpSoft\Emitter\EmitterInterface;
 use HttpSoft\Emitter\SapiEmitter;
+use HttpSoft\Runner\MiddlewareResolverInterface;
+use HttpSoft\Runner\MiddlewareResolver;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -74,6 +76,8 @@ return [
 
     TemplateInterface::class => fn() => (new TemplateFactory())->create(),
     I18nModelInterface::class => fn() => new I18nModelFile(findPaths('i18n')),
+
+    MiddlewareResolverInterface::class => fn(ContainerInterface $c) => new MiddlewareResolver($c),
 
     UserInterface::class => User::class,
 ];

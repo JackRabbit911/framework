@@ -20,6 +20,12 @@ abstract class MakeAbstract extends Command
         $io = new SymfonyStyle($input, $output);
 
         $name = $input->getArgument('name');
+
+        if (!str_contains($name, '/') && !str_contains($name, '\\')) {
+            $io->error("Cannot create class without namespace");
+            return Command::SUCCESS;
+        }
+
         $filepath = $this->getFilepath($name);
 
         if (is_file($filepath)) {
@@ -28,11 +34,11 @@ abstract class MakeAbstract extends Command
         }
 
         $info = pathinfo($filepath);
-        $dir = $info['dirname'];
+        $dir = rtrim($info['dirname'], '/') . '/';
 
         $data = [
             'php' => '<?php',
-            'namespace' => $this->getNamespace($dir),
+            'namespace' => $this->getNamespace($dir, $name),
             'classname' => $info['filename'],
         ];
 
@@ -41,16 +47,16 @@ abstract class MakeAbstract extends Command
         if (!is_dir($dir)) {
             mkdir($dir, 0775, true);
         }
-        
+
         if (!is_writable($dir)) {
             chmod($dir, 0775);
         }
-        
+
         if (!is_dir($dir) || !is_writable($dir)) {
             $io->error("$dir is not writable");
             return Command::SUCCESS;
         }
-        
+
         $content = $this->createContent($data);
 
         if (!$content) {
@@ -59,26 +65,25 @@ abstract class MakeAbstract extends Command
         }
 
         file_put_contents($filepath, $content);
-        
+
         $io->success("File $filepath was created succefully");
         return Command::SUCCESS;
     }
 
     protected function getFilepath($name)
     {
-        if (str_starts_with($name, '/') || str_starts_with($name, '\\')) {
-            $name = ltrim($name, '\\/');
-        } else {
-            $name = ucfirst($this->folder) . '/' . $name;
-        }
-
+        $name = ltrim($name, '/');
+        $name = ucwords($name, '/');
+        $name = lcfirst($name);
         $filename = str_replace(['\\', '.php'], ['/', ''], $name) . '.php';
+
         return APPPATH . $filename;
     }
 
-    protected function getNamespace($dirname)
+    protected function getNamespace($dirname, $name)
     {
-        return str_replace([APPPATH, '/'], ['App\\', '\\'], $dirname);
+        $namespace = str_replace([APPPATH, '/'], ['', '\\'], $dirname);
+        return ucwords(rtrim($namespace, '\\'), '\\');
     }
 
     protected function createContent($data)

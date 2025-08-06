@@ -10,7 +10,6 @@ use Symfony\Component\Console\Input\InputArgument;
 #[AsCommand(name: 'make:model')]
 class Model extends MakeAbstract
 {
-    protected string $folder = 'model';
     protected string $blank = 'model';
 
     protected function configure(): void

@@ -7,13 +7,13 @@ namespace Sys\Console;
 final class CallApi
 {
     private string $classname;
-    private string $method;
+    private ?string $method;
     private string $query;
 
-    public function __construct(string $classname, string $method, ?array $args = null)
+    public function __construct(string $classname, ?string $method = null, ?array $args = null)
     {
         $this->classname = $classname;
-        $this->method = $method;
+        $this->method = $method ?? '__invoke';
         $this->query = ($args) ? '?' . http_build_query($args) : '';
     }
 

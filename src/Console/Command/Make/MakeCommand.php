@@ -12,7 +12,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'make:command', aliases: ['mk:cmd'])]
 class MakeCommand extends MakeAbstract
 {
-    protected string $folder = 'command';
     protected string $blank = 'command';
 
     protected function configure(): void

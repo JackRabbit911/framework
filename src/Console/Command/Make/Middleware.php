@@ -10,7 +10,6 @@ use Symfony\Component\Console\Input\InputArgument;
 #[AsCommand(name: 'make:middleware', aliases: ['mk:mw'])]
 class Middleware extends MakeAbstract
 {
-    protected string $folder = 'middleware';
     protected string $blank = 'middleware';
 
     protected function configure(): void

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Sys\Observer\Interface;
 
-use Sys\Pipeline\PostProccessHandlerInterface;
-
-interface ObserverInterface extends PostProccessHandlerInterface
+interface ObserverInterface
 {
-    public function update(object $object): void;
+    public function update(string|object $object): self;
+
+    public function handle(): void;
 }

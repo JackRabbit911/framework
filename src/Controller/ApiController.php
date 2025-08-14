@@ -33,12 +33,12 @@ abstract class ApiController implements RequestHandlerInterface// extends BaseCo
 
         $this->_before();
         $response = $this->call($action, $this->parameters);
+        $this->_after($response);
 
         if (!$response instanceof ResponseInterface) {
             $response = new JsonResponse($response, 200);
         }
 
-        $this->_after($response);
         return $response;
     }
 

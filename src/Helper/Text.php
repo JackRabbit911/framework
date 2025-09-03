@@ -6,24 +6,34 @@ use Behat\Transliterator\Transliterator;
 
 final class Text extends Transliterator
 {
-    public function snakeToCamel($string, $capitalizeFirstCharacter = false)
+    public function snakeToCamel(string $string): string
     {
-        return $this->dashesToCamelCase($string, '_', $capitalizeFirstCharacter);
+        return $this->dashesToCamelCase($string, '_', false);
     }
 
-    public function kebabToCamel($string, $capitalizeFirstCharacter = false)
+    public function kebabToCamel(string $string): string
     {
-        return $this->dashesToCamelCase($string, '-', $capitalizeFirstCharacter);
+        return $this->dashesToCamelCase($string, '-', false);
     }
 
-    public function camelToSnake($string)
+    public function camelToSnake(string $string): string
     {
         return strtolower(preg_replace('/(?<=.)[A-Z]/', '_$0', $string));
     }
 
-    public function camelToKebab($string)
+    public function camelToKebab(string $string): string
     {
         return strtolower(preg_replace('/(?<=.)[A-Z]/', '-$0', $string));
+    }
+
+    public function snakeToPascal(string $string): string
+    {
+        return $this->dashesToCamelCase($string, '_', true);
+    }
+
+    public function kebabToPascal(string $string): string
+    {
+        return $this->dashesToCamelCase($string, '-', true);
     }
 
     public function fileToClassName($string, $remove_substr = APPPATH)

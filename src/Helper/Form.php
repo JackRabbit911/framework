@@ -27,4 +27,15 @@ final class Form
 
         return $result;
     }
+
+    public static function santizeFormData(array &$post, ?array $types = null)
+    {
+        array_walk_recursive($post, function (&$item, $key, $types) {
+            $type = $types[$key] ?? (is_numeric($item) ? 'int' : null);
+
+            if ($type) {
+                settype($item, $type);
+            }
+        }, $types);
+    }
 }

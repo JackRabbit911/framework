@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Symfony\Component\Console\Command\Command;
+use Sys\Console\Command\Clear\Log;
 use Sys\Console\Command\Clear\Session;
 use Sys\Console\Command\Database\Migrate;
 use Sys\Console\Command\Do\Unittest;
@@ -41,6 +42,7 @@ return [
     'db:mgrt' => static fn(): Command => container()->get(Migrate::class),
 
     'clear:sess' => static fn(): Command => container()->get(Session::class),
+    'clear:log' => static fn(): Command => container()->get(Log::class),
 
     'do:test' => static fn(): Command => container()->get(Unittest::class),
 ];

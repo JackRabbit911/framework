@@ -54,6 +54,11 @@ final class I18n
         return ($values) ? strtr($string, $values) : $string;
     }
 
+    public function getMap(array $filter, ?string $path = null)
+    {
+        return $this->model->getMap($this->lang, $filter, $path);
+    }
+
     public function detectLang(ServerRequestInterface $request)
     {
         $detector = new DetectLang($this->langs, $this->index);

@@ -57,20 +57,22 @@ class Arr
         array_walk_recursive($array, function (&$value) {
             if (is_string($value)) {
                 $value = trim($value);
+
+                if (is_numeric($value)) {
+                    if (str_contains($value, '.')) {
+                        settype($value, 'float');
+                    } else {
+                        settype($value, 'integer');
+                    }
+                }
             }
 
-            $value = match (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)) {
-                false => 0,
-                true => 1,
-                default => $value,
-            };
-
-            if (is_numeric($value) && is_string($value)) {
-                if (str_contains($value, '.')) {
-                    settype($value, 'float');
-                } else {
-                    settype($value, 'integer');
-                }
+            if ($value !== '') {
+                $value = match (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)) {
+                    false => 0,
+                    true => 1,
+                    default => $value,
+                };
             }
         });
 

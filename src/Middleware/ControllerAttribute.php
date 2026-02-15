@@ -38,7 +38,7 @@ final class ControllerAttribute implements MiddlewareInterface
         }
         
         $routeHandler = $route->getHandler();
-        $reflect = $request->getAttribute('reflect') ?? $this->getReflect($routeHandler);
+        $reflect = method_exists($route, 'reflect') ? $route->reflect() : $this->getReflect($routeHandler);
         $attributes = $this->getAttributes($reflect);
 
         foreach ($attributes as $attr) {

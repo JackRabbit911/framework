@@ -27,9 +27,9 @@ class App
         $setErrorHandler;
     }
 
-    public function pipe($middleware, ?string $path = null): void
+    public function pipe($middleware, ?string $prefix = null): void
     {
-        $this->pipeline->pipe($middleware);
+        $this->pipeline->pipe($middleware, $prefix);
     }
 
     public function run(): void
@@ -39,7 +39,9 @@ class App
             require_once $file;
         }
 
-        $this->pipe(config('pipeline'));
+        foreach (config('pipeline') as $mw) {
+            $this->pipe($mw);
+        }
 
         $response = $this->pipeline
             ->process($this->request, $this->defaultHandler);

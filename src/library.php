@@ -128,23 +128,6 @@ function url($routeName = null, $params = [])
     return $scheme . '://' . $host . $path;
 }
 
-// function findPath($path, $all = false)
-// {
-//     $paths = glob(APPPATH . '*{\/src,}/' . ltrim($path, '/'), GLOB_BRACE);
-
-//     foreach ($paths as $path) {
-//         if (file_exists($path)) {
-//             if ($all) {
-//                 $result[] = $path;
-//             } else {
-//                 return $path;
-//             }
-//         }
-//     }
-
-//     return $result ?? null;
-// }
-
 function findPaths(array|string $pattern)
 {
     $iterator = Finder::findDirectories($pattern)
@@ -296,4 +279,24 @@ function logger(?string $content, string $file = 'log.txt'):void
         $file = $prefix . $file;
         file_put_contents($file, $content, FILE_APPEND);
     }
+}
+
+function referer(?ServerRequestInterface $request = null, string $default = '/')
+{
+    if ($request) {
+        $params = $request->getServerParams();
+        $referer = $params['HTTP_REFERER'] ?? null;
+        $host = $params['HTTP_HOST'];
+        $scheme = $params['REQUEST_SCHEME'];
+    } else {
+        $referer = $_SERVER['HTTP_REFERER'] ?? null;
+        $host = $_SERVER['HTTP_HOST'];
+        $scheme = $_SERVER['REQUEST_SCHEME'];
+    }
+
+    $referer_host = $referer ? parse_url($referer, PHP_URL_HOST) : $host;
+    $default = rtrim($scheme . '://' . $host . '/'. $default, '/');
+    $referer = $referer ?: $default;
+
+    return $host === $referer_host ? $referer : $default;
 }

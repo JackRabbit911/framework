@@ -18,9 +18,9 @@ use Sys\Template\TemplateInterface;
 function dd(...$values)
 {
     ob_start();
-        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1);
-        echo 'file: ', $trace[0]['file'], ' line: ', $trace[0]['line'], '<br>';
-        var_dump(...$values);
+    $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1);
+    echo 'file: ', $trace[0]['file'], ' line: ', $trace[0]['line'], '<br>';
+    var_dump(...$values);
     $output = ob_get_clean();
 
     echo (php_sapi_name() !== 'cli') ? $output : str_replace('<br>', PHP_EOL, strip_tags($output, ['<br>', '<pre>']));
@@ -68,13 +68,14 @@ function config(string $file, ?string $path = null, $default = null, $cache = nu
     if (isset($cache)) {
         $config->enable($cache);
     }
-    
+
     $result = $config?->get($file, $path, $default);
     $config?->enable($is_cache);
     return $result;
 }
 
-function dot(&$arr, $path, $default = null, $separator = '.') {
+function dot(&$arr, $path, $default = null, $separator = '.')
+{
     $keys = explode($separator, $path);
 
     foreach ($keys as $key) {
@@ -82,7 +83,7 @@ function dot(&$arr, $path, $default = null, $separator = '.') {
             $arr = &$default;
         } else {
             $arr = &$arr[$key];
-        }       
+        }
     }
 
     return $arr;
@@ -154,7 +155,7 @@ function json(?string $string, $unique = false)
 function createCsrf()
 {
     $salt = $_SERVER['HTTP_USER_AGENT'] ?? uniqid();
-    $token = md5($salt.time().bin2hex(random_bytes(12)));
+    $token = md5($salt . time() . bin2hex(random_bytes(12)));
     $session = container()->get(SessionInterface::class);
     $session->set('_csrf', $token);
     return $token;
@@ -171,17 +172,18 @@ function getCallable(string|array $callable): mixed
             $callable = [$callable, '__invoke'];
         }
     }
-    
+
     return $callable;
 }
 
-function call($callable, array $data = []) {
+function call($callable, array $data = [])
+{
     $container = container();
     $callable = getCallable($callable);
 
     try {
-        return $container->call($callable, $data);        
-    } catch (\DI\Definition\Exception\InvalidDefinition|\Invoker\Exception\InvocationException $e) {
+        return $container->call($callable, $data);
+    } catch (\DI\Definition\Exception\InvalidDefinition | \Invoker\Exception\InvocationException $e) {
         [$class, $method] = $callable;
         $instance = (is_string($class)) ? $container->make($class, $data) : $class;
         return $container->call([$instance, $method], $data);
@@ -214,7 +216,7 @@ function is_ajax(ServerRequestInterface $request)
 
 function render($file, $data)
 {
-    extract($data, EXTR_SKIP);               
+    extract($data, EXTR_SKIP);
     ob_start();
     include $file;
     return ob_get_clean();
@@ -272,7 +274,7 @@ function redirect($url, $code = 302)
     exit;
 }
 
-function logger(?string $content, string $file = 'log.txt'):void
+function logger(?string $content, string $file = 'log.txt'): void
 {
     if ($content) {
         $prefix = STORAGE . 'logs/';
@@ -284,19 +286,26 @@ function logger(?string $content, string $file = 'log.txt'):void
 function referer(?ServerRequestInterface $request = null, string $default = '/')
 {
     if ($request) {
-        $params = $request->getServerParams();
+        $uri = $request->getUri();
+        $scheme = $uri->getScheme();
+        $host = $uri->getHost();
+        $path = $uri->getPath();
         $referer = $params['HTTP_REFERER'] ?? null;
-        $host = $params['HTTP_HOST'];
-        $scheme = $params['REQUEST_SCHEME'];
     } else {
-        $referer = $_SERVER['HTTP_REFERER'] ?? null;
-        $host = $_SERVER['HTTP_HOST'];
         $scheme = $_SERVER['REQUEST_SCHEME'];
+        $host = $_SERVER['HTTP_HOST'];
+        $path = $_SERVER['REQUEST_URI'];
+        $referer = $_SERVER['HTTP_REFERER'] ?? null;
     }
 
+    $current_uri = rtrim($scheme . '://' . $host . '/' . $path);
+
     $referer_host = $referer ? parse_url($referer, PHP_URL_HOST) : $host;
-    $default = rtrim($scheme . '://' . $host . '/'. $default, '/');
+    $default = rtrim($scheme . '://' . $host . '/' . $default, '/');
+
     $referer = $referer ?: $default;
+    $referer = rtrim($referer, '/');
+    $referer = $referer !== $current_uri ? $referer : $default;
 
     return $host === $referer_host ? $referer : $default;
 }

@@ -185,10 +185,6 @@ class SimpleRequest
 
     public function referer($default = '/')
     {
-        if (isset($this->request->getServerParams()['HTTP_REFERER'])) {
-            return $this->request->getServerParams()['HTTP_REFERER'];
-        }
-
-        return $default ?? path('home');
+        return referer($this->request);
     }
 }

@@ -90,6 +90,6 @@ abstract class WebController extends BaseController
             $default = url('home');
         }
 
-        return $this->request->getServerParams()['HTTP_REFERER'] ?? $default;
+        return referer($this->request, $default);
     }
 }

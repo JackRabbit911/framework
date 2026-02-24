@@ -66,7 +66,7 @@ class CreateClass
 
     private function createContent($data)
     {
-        $blank = SYSPATH . 'Console/blanks/migration.php';
+        $blank = FRAMEWORK . 'Console/blanks/migration.php';
 
         if (!is_file($blank)) {
             return false;

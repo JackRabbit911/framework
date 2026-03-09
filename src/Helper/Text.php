@@ -49,9 +49,14 @@ final class Text extends Transliterator
         return strtolower(str_replace($search, $replace, $string));
     }
 
+    public function strWordCount($str)
+    {
+        return preg_match_all('/\p{L}+/u', $str, $matches);
+    }
+
     public function catStr($str, $count_words)
     {
-        if (str_word_count($str) <= $count_words) {
+        if ($this->strWordCount($str) <= $count_words) {
             return $str;
         }
 

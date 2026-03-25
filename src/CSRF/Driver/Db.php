@@ -40,8 +40,10 @@ class Db extends MysqlModel implements DriverInterface
         return $stmt->rowCount() > 0;
     }
 
-    public function generate(?int $user_id, int $expire): string
+    public function generate(?int $user_id, string $form, int $expire): string
     {
+        $this->delete($user_id, $form);
+
         while (true) {
             $salt = $_SERVER['HTTP_USER_AGENT'] ?? uniqid();
             $token = md5($salt . time() . bin2hex(random_bytes(12)));
@@ -55,6 +57,7 @@ class Db extends MysqlModel implements DriverInterface
                     ->insert([
                         'token' => $token,
                         'user_id' => $user_id,
+                        'form' => $form,
                         'expire' => $expire_string,
                     ]);
 
@@ -76,5 +79,13 @@ class Db extends MysqlModel implements DriverInterface
             ->delete();
 
         return $stmt->rowCount();
+    }
+
+    private function delete(?int $user_id, string $form)
+    {
+        $this->qb->table('csrf')
+            ->where('user_id', '=', $user_id)
+            ->where('form', '=', $form)
+            ->delete();
     }
 }

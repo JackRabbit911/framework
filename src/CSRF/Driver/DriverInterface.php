@@ -8,7 +8,7 @@ interface DriverInterface
 {
     public function validate(string $token, int $user_id): bool;
 
-    public function generate(int $user_id, int $expire): string;
+    public function generate(?int $user_id, string $form, int $expire): string;
 
     public function gc(): int;
 }

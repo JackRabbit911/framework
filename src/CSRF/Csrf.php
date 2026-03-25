@@ -10,9 +10,9 @@ class Csrf
 {
     public function __construct(private DriverInterface $driver){}
 
-    public function generate(?int $user_id, int $expire): string
+    public function generate(?int $user_id, string $form, int $expire): string
     {
-        return $this->driver->generate($user_id, $expire);
+        return $this->driver->generate($user_id, $form, $expire);
     }
 
     public function validate(string $token, ?int $user_id): bool

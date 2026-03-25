@@ -20,9 +20,21 @@ class ApiCsrfMiddleware implements MiddlewareInterface
         if (in_array($request->getMethod(), ['GET', 'HEAD', 'OPTIONS'])) {
             return $handler->handle($request);
         }
+
+        $data = $request->getBody()->getContents();
+
+        if (empty($data)) {
+            $data = $request->getParsedBody();
+        }
+
+        if (is_string($data)) {
+            $data = json_decode($data, true) ?? [];
+        }
+
+        $data += $request->getQueryParams();
         
         $user = $request->getAttribute('user');
-        $token = $request->getHeaderLine('X-CSRF');
+        $token = $data['_csrf'] ?? $request->getHeaderLine('X-CSRF') ?? '';
         $valid = Csrf::validate($token, $user?->id);
 
         return $valid ? $handler->handle($request) : new JsonResponse('Token not match', 400);

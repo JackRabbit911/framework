@@ -36,7 +36,7 @@ class ApiCsrfMiddleware implements MiddlewareInterface
         $data = $this->getData($request);
         $user = $request->getAttribute('user');
         $token = $data['_csrf'] ?? $request->getHeaderLine('X-CSRF') ?? '';
-        $valid = Csrf::validate($token, $user?->id);
+        $valid = Csrf::validate($token, $user?->id ?? $data['id']);
 
         return $valid
             ? $handler->handle($this->removeCsrf($request, $data))
@@ -52,7 +52,7 @@ class ApiCsrfMiddleware implements MiddlewareInterface
         };
     }
 
-    private function removeCsrf(ServerRequestInterface  $request, $data)
+    private function removeCsrf(ServerRequestInterface  $request, $data): ServerRequestInterface
     {
         unset($data['_csrf']);
 
@@ -61,11 +61,16 @@ class ApiCsrfMiddleware implements MiddlewareInterface
                 $factory = new StreamFactory();
                 $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
                 $stream = $factory->createStream($json);
-                return $request->withBody($stream);
+                $r = $request->withBody($stream);
+                break;
             case self::FORM:
-                return $request->withParsedBody($data);
+                $r = $request->withParsedBody($data);
+                break;
             case self::QUERY:
-                return $request->withQueryParams($data);
+                $r = $request->withQueryParams($data);
+                break;
         }
+
+        return $r;
     }
 }

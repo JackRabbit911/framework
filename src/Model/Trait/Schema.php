@@ -8,7 +8,7 @@ trait Schema
 {
     private array $cache;
     
-    public function tables(string $prefix = null)
+    public function tables(?string $prefix = null)
     {
         if (isset($this->cache['schema']['tables'])) {
             return $this->cache['schema']['tables'];
@@ -24,7 +24,7 @@ trait Schema
         return $tables;
     }
 
-    public function columns($table = null): array
+    public function columns(?string $table = null): array
     {
         if (!$table) {
             $table = $this->table;
@@ -46,7 +46,7 @@ trait Schema
         return $columns;
     }
 
-    public function nextAI($table = null): int
+    public function nextAI(?string $table = null): int
     {
         if (!$table) {
             $table = $this->table;
@@ -59,5 +59,10 @@ trait Schema
 
         $sth = $this->qb->pdo()->query($sql);
         return $sth->fetchColumn();
+    }
+
+    public function prepareData(string $table, array $data)
+    {
+        return array_intersect_key($data, array_flip($this->columns($table)));
     }
 }

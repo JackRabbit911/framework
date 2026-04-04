@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Sys\I18n;
 
@@ -14,16 +16,16 @@ final class I18n
 
     public DetectionMethod $detectionMethod = DetectionMethod::None;
     public Redirect $redirect = Redirect::None;
-    private I18nModelInterface $model;
     private string $lang;
     private array $langs = [];
     private int $index = 0;
     private bool $needInsertSegment = false;
 
     public function __construct(
-        ServerRequestInterface $request,
-        I18nModelInterface $model, mixed $config = null)
-    {
+        private ServerRequestInterface $request,
+        private I18nModelInterface $model,
+        mixed $config = null
+    ) {
         $this->options();
         $this->lang = $this->detectLang($request);
         $this->model = $model;
@@ -59,7 +61,7 @@ final class I18n
         return $this->model->getMap($this->lang, $filter, $path);
     }
 
-    public function detectLang(ServerRequestInterface $request)
+    private function detectLang(ServerRequestInterface $request)
     {
         $detector = new DetectLang($this->langs, $this->index);
         return $detector->detectLang($request, $this->detectionMethod);
@@ -83,8 +85,8 @@ final class I18n
     {
         foreach ($this->langs as $lang => $title) {
             if ($this->lang != $lang) {
-                $key = $this->_path($path, $lang);
-                $list[$key] = $title;               
+                $key = $this->getLangLink($path, $lang);
+                $list[$key] = $title;
             }
         }
 
@@ -101,12 +103,33 @@ final class I18n
         $this->model->addPath($path);
     }
 
-    private function _path($path, $lang)
+    public function setPaths(string ...$paths): void
+    {
+        $this->model->setPaths($paths);
+    }
+
+    private function _path(string $path, string $lang): string
     {
         $arr = explode('/', trim($path, '/'));
-        $arr = array_merge(array_slice($arr, 0, $this->index),
-            [$lang],
-            array_slice($arr, $this->index));
-        return '/' . rtrim(implode ('/', $arr), '/');
+        $arr[$this->index] = $lang;
+
+        return '/' . rtrim(implode('/', $arr), '/');
+    }
+
+    private function getLangLink($path, $lang)
+    {
+        if ($this->detectionMethod === DetectionMethod::Subdomain) {
+            $uri = $this->request->getUri();
+            $scheme = $uri->getScheme();
+            $host = $uri->getHost();
+            $arrayHostItems = explode('.', $host);
+
+            $arrayHostItems[$this->index] = $lang;
+            $newHost = implode('.', $arrayHostItems);
+
+            return $scheme . '://' . $newHost;
+        } else {
+            return $this->_path($path, $lang);
+        }
     }
 }

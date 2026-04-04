@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Sys\CSRF\Middleware;
 
 use Sys\CSRF\Facade\Csrf;
-use HttpSoft\Message\StreamFactory;
 use HttpSoft\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -39,7 +38,7 @@ class ApiCsrfMiddleware implements MiddlewareInterface
         $valid = Csrf::validate($token, $user?->id ?? $data['id']);
 
         return $valid
-            ? $handler->handle($this->removeCsrf($request, $data))
+            ? $handler->handle($request)
             : new JsonResponse('Token not match', 400);
     }
 
@@ -50,27 +49,5 @@ class ApiCsrfMiddleware implements MiddlewareInterface
             self::FORM => $request->getParsedBody(),
             self::QUERY => $request->getQueryParams(),
         };
-    }
-
-    private function removeCsrf(ServerRequestInterface  $request, $data): ServerRequestInterface
-    {
-        unset($data['_csrf']);
-
-        switch ($this->source) {
-            case self::BODY:
-                $factory = new StreamFactory();
-                $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-                $stream = $factory->createStream($json);
-                $r = $request->withBody($stream);
-                break;
-            case self::FORM:
-                $r = $request->withParsedBody($data);
-                break;
-            case self::QUERY:
-                $r = $request->withQueryParams($data);
-                break;
-        }
-
-        return $r;
     }
 }

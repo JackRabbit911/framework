@@ -12,12 +12,7 @@ use HttpSoft\Response\RedirectResponse;
 
 final class I18nMiddleware implements MiddlewareInterface
 {
-    private I18n $i18n;
-
-    public function __construct(I18n $i18n)
-    {
-        $this->i18n = $i18n;
-    }
+    public function __construct(private I18n $i18n){}
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

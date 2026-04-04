@@ -28,6 +28,11 @@ class File implements I18nModelInterface
         array_push($this->paths, $path);
     }
 
+    public function setPaths(array $paths): void
+    {
+        $this->paths = $paths;
+    }
+
     public function getMap(string $lang, array $filter, ?string $path = null)
     {
         $new_map = function ($filter, $map) {

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Sys\I18n;
 
 use Sys\I18n\Model\I18nModelInterface;
-use Sys\Trait\Options;
 use Sys\I18n\Enum\DetectionMethod;
 use Sys\I18n\Enum\Redirect;
+use Sys\Trait\Options;
 use Psr\Http\Message\ServerRequestInterface;
 
 final class I18n
@@ -108,6 +108,24 @@ final class I18n
         $this->model->setPaths($paths);
     }
 
+    public function generateSubdomainUri($lang)
+    {
+        $uri = $this->request->getUri();
+        $scheme = $uri->getScheme();
+        $host = $uri->getHost();
+        $arrayHostItems = explode('.', $host);
+
+        $item = $arrayHostItems[$this->index];
+        $langKeys = array_keys($this->langs);
+        $remove = in_array($item, $langKeys) ? 1 : 0;
+
+        array_splice($arrayHostItems, $this->index, $remove, $lang);
+
+        $newHost = implode('.', $arrayHostItems);
+
+        return $scheme . '://' . $newHost;
+    }
+
     private function _path(string $path, string $lang): string
     {
         $arr = explode('/', trim($path, '/'));
@@ -119,15 +137,7 @@ final class I18n
     private function getLangLink($path, $lang)
     {
         if ($this->detectionMethod === DetectionMethod::Subdomain) {
-            $uri = $this->request->getUri();
-            $scheme = $uri->getScheme();
-            $host = $uri->getHost();
-            $arrayHostItems = explode('.', $host);
-
-            $arrayHostItems[$this->index] = $lang;
-            $newHost = implode('.', $arrayHostItems);
-
-            return $scheme . '://' . $newHost;
+            return $this->generateSubdomainUri($lang);
         } else {
             return $this->_path($path, $lang);
         }

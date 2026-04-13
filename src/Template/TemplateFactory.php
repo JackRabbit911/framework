@@ -20,7 +20,7 @@ class TemplateFactory
         $paths = $paths ?: $config['paths'] ?? findPaths('views');
         $options = $config['options'] ?? $this->options;
 
-        $loader = new FilesystemLoader($paths, APPPATH);
+        $loader = new FilesystemLoader($paths);
         $twig = new Environment($loader, $options);
 
         if (ENV > PRODUCTION) {

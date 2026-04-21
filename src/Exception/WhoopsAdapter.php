@@ -50,9 +50,9 @@ final class WhoopsAdapter implements SetErrorHandlerInterface
             ini_set('display_errors', 0);     
             $this->pushHttpHandler($whoops, $responseType);
             
-            if (env('APP_ENV') <= PRODUCTION) {
-                $this->pushRollbackHandler($whoops);
-            }
+            // if (env('APP_ENV') <= PRODUCTION) {
+            //     $this->pushRollbackHandler($whoops);
+            // }
         }
 
         $this->pushLogHandler($whoops, $logger);

@@ -49,6 +49,9 @@ abstract class WebController extends BaseController
         $this->app->add('user', $this->user);
         $this->app->add('session', $this->session);
         $this->app->add('request', $request);
+        $this->app->add('env', function($key) {
+            return env($key);
+        });
         $this->tpl->addGlobal('app', $this->app);
 
         return parent::handle($request);

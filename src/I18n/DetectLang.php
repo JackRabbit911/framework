@@ -46,10 +46,10 @@ class DetectLang
         return null;
     }
 
-    public function detectBySegment(string $uri): ?string
+    public function detectBySegment(string $uri, ?bool $default = true): ?string
     {
         $array = explode('/', trim($uri, '/'));
-        return $this->getLangFromArray($array);
+        return $this->getLangFromArray($array, $default);
     }
 
     public function detectBySubdomain(string $host): ?string
@@ -68,12 +68,12 @@ class DetectLang
         };
     }
 
-    private function getLangFromArray($array): ?string
+    private function getLangFromArray(array $array, ?bool $default = true): ?string
     {
         if (isset($array[$this->index]) && isset($this->langs[$array[$this->index]])) {
             return $array[$this->index];
         }
 
-        return array_key_first($this->langs);
+        return $default ? array_key_first($this->langs) : null;
     }
 }

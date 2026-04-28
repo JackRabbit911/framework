@@ -283,14 +283,14 @@ function logger(?string $content, string $file = 'log.txt'): void
     }
 }
 
-function referer(?ServerRequestInterface $request = null, string $default = '/')
+function referer(?ServerRequestInterface $request = null, ?string $default = '/')
 {
     if ($request) {
         $uri = $request->getUri();
         $scheme = $uri->getScheme();
         $host = $uri->getHost();
         $path = $uri->getPath();
-        $referer = $params['HTTP_REFERER'] ?? null;
+        $referer = $request->getServerParams()['HTTP_REFERER'] ?? null;
     } else {
         $scheme = $_SERVER['REQUEST_SCHEME'];
         $host = $_SERVER['HTTP_HOST'];
@@ -301,9 +301,13 @@ function referer(?ServerRequestInterface $request = null, string $default = '/')
     $current_uri = rtrim($scheme . '://' . $host . '/' . $path);
 
     $referer_host = $referer ? parse_url($referer, PHP_URL_HOST) : $host;
-    $default = rtrim($scheme . '://' . $host . '/' . $default, '/');
+    $default = $default === null ? null : rtrim($scheme . '://' . $host . '/' . $default, '/');
+    $referer = $referer ? $referer : $default;
 
-    $referer = $referer ?: $default;
+    if ($referer === null) {
+        return null;
+    }
+
     $referer = rtrim($referer, '/');
     $referer = $referer !== $current_uri ? $referer : $default;
 

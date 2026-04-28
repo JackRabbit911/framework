@@ -16,6 +16,7 @@ final class I18n
 
     public DetectionMethod $detectionMethod = DetectionMethod::None;
     public Redirect $redirect = Redirect::None;
+    public DetectLang $detector;
     private string $lang;
     private array $langs = [];
     private int $index = 0;
@@ -24,9 +25,9 @@ final class I18n
     public function __construct(
         private ServerRequestInterface $request,
         private I18nModelInterface $model,
-        mixed $config = null
     ) {
         $this->options();
+        $this->detector = new DetectLang($this->langs, $this->index);
         $this->lang = $this->detectLang($request);
         $this->model = $model;
     }
@@ -63,8 +64,7 @@ final class I18n
 
     private function detectLang(ServerRequestInterface $request)
     {
-        $detector = new DetectLang($this->langs, $this->index);
-        return $detector->detectLang($request, $this->detectionMethod);
+        return $this->detector->detectLang($request, $this->detectionMethod);
     }
 
     public function path(string $path): string
@@ -73,7 +73,7 @@ final class I18n
             return $path;
         }
 
-        return $this->_path($path, $this->lang);
+        return $this->insertSegmentToPath($path, $this->lang);
     }
 
     public function needInsertSegment()
@@ -126,7 +126,7 @@ final class I18n
         return $scheme . '://' . $newHost;
     }
 
-    private function _path(string $path, string $lang): string
+    public function insertSegmentToPath(string $path, string $lang): string
     {
         $arr = explode('/', trim($path, '/'));
         $arr[$this->index] = $lang;
@@ -139,7 +139,7 @@ final class I18n
         if ($this->detectionMethod === DetectionMethod::Subdomain) {
             return $this->generateSubdomainUri($lang);
         } else {
-            return $this->_path($path, $lang);
+            return $this->insertSegmentToPath($path, $lang);
         }
     }
 }

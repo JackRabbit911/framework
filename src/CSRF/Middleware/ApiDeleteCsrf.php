@@ -11,22 +11,16 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class ApiCsrfMiddleware implements MiddlewareInterface
+class ApiDeleteCsrf implements MiddlewareInterface
 {
     public function process(
         ServerRequestInterface $request,
         RequestHandlerInterface $handler
     ): ResponseInterface {
-        if (in_array($request->getMethod(), ['GET', 'HEAD', 'OPTIONS'])) {
-            return $handler->handle($request);
-        }
-
-        $user = $request->getAttribute('user');
+        $user_id = $request->getAttribute('user')?->id;
         $token = $request->getHeaderLine(Csrf::getHeaderName());
-        $valid = Csrf::validate($token, $user?->id ?? $data['id']);
+        Csrf::delete($token, $user_id);
 
-        return $valid
-            ? $handler->handle($request)
-            : new JsonResponse('Token not match', 400);
+        return $handler->handle($request);
     }
 }

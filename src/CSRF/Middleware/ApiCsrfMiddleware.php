@@ -23,7 +23,7 @@ class ApiCsrfMiddleware implements MiddlewareInterface
 
         $user = $request->getAttribute('user');
         $token = $request->getHeaderLine(Csrf::getHeaderName());
-        $valid = Csrf::validate($token, $user?->id ?? $data['id']);
+        $valid = Csrf::validate($token, $user?->id ?? null);
 
         return $valid
             ? $handler->handle($request)

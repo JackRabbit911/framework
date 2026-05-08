@@ -129,10 +129,10 @@ function url($routeName = null, $params = [])
     return $scheme . '://' . $host . $path;
 }
 
-function findPaths(array|string $pattern)
+function findPaths(array|string $pattern, $dir = APPPATH)
 {
     $iterator = Finder::findDirectories($pattern)
-        ->from(APPPATH)
+        ->from($dir)
         ->sortByName();
 
     foreach ($iterator as $item) {

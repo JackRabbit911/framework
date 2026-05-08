@@ -87,14 +87,14 @@ class Image
         if ($this->isAnimated) {
             $this->im = $this->im->coalesceImages();
 
-            if (($width > 0 && $this->im->getImageWidth() > $with) || ($height > 0 && $this->im->getImageHeight() > $height)) {
+            if (($width > 0 && $this->im->getImageWidth() > $width) || ($height > 0 && $this->im->getImageHeight() > $height)) {
                 foreach ($this->im as $frame) {
                     call_user_func([$frame, $func], $width, $height);
                     $frame->setImagePage($width, $height, 0, 0);
                 }
             }
         } else {
-            if (($width > 0 && $this->im->getImageWidth() > $with) || ($height > 0 && $this->im->getImageHeight() > $height)) {
+            if (($width > 0 && $this->im->getImageWidth() > $width) || ($height > 0 && $this->im->getImageHeight() > $height)) {
                 call_user_func([$this->im, $func], $width, $height);
             }
         }

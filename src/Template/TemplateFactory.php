@@ -11,6 +11,7 @@ class TemplateFactory
     private array $options = [
         'strict_variables' => ENV > PRODUCTION,
         'debug' => ENV > PRODUCTION,
+        'autoescape' => false,
     ];
 
     public function create($paths = null): Template

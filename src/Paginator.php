@@ -15,7 +15,6 @@ class Paginator extends Component
     private int $currentPage;
     private string $key;
     private int $limit;
-    private string $view;
 
     public function __construct(ServerRequestInterface $request, int $countRows, int $limit, string $view = 'pagination', string $key = 'page')
     {
@@ -29,11 +28,8 @@ class Paginator extends Component
         $this->key = $key;
         $this->limit = $limit;
         $this->view = $view;
-    }
 
-    public function render()
-    {
-        return view($this->view, ['p' => $this]);
+        $this->data = ['p' => $this];
     }
 
     public function offset()

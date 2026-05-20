@@ -20,10 +20,9 @@ abstract class ComponentController extends Component implements RequestHandlerIn
 
     protected ServerRequestInterface $request;
     protected ?UserInterface $user;
-    protected string $view;
+    protected ?string $view = null;
     protected array $data = [];
     protected ?string $js = null;
-    // private array $parameters;
     private TemplateInterface $tpl;
     private App $app;
 
@@ -42,7 +41,6 @@ abstract class ComponentController extends Component implements RequestHandlerIn
         $this->app->add('user', $this->user);
         
         $route = $request->getAttribute(Route::class);
-        // $this->parameters = $route->getParameters();
         [$handler, $action] = $route->getHandler();
 
         return $this->call($action, $route->getParameters());

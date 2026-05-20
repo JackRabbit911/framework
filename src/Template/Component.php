@@ -6,7 +6,7 @@ use HttpSoft\Response\HtmlResponse;
 
 abstract class Component
 {
-    protected string $view;
+    protected ?string $view = null;
     protected array $data = [];
     protected ?string $js = null;
 
@@ -27,9 +27,13 @@ abstract class Component
         return $this;
     }
 
-    protected function render(): string
+    protected function render(): string | null
     {
-        $tpl = container()->get(TemplateInterface::class);
-        return $tpl->render($this->view, $this->data);
+        if ($this->view) {
+            $tpl = container()->get(TemplateInterface::class);
+            return $tpl->render($this->view, $this->data);
+        }
+
+        return '';
     }
 }

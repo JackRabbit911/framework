@@ -263,6 +263,7 @@ class File
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
             'image/gif' => 'gif',
+            'image/webp' => 'webp',
         ];
 
         $ext = $mimes[$mime] ?? false;

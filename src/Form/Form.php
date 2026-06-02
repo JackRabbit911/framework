@@ -9,7 +9,7 @@ class Form extends Component
 {
     use ComponentForm;
 
-    protected string $view;
+    protected ?string $view;
 
     protected array $inputs = [
         'text', 'button','checkbox', 'color','date', 'datetime-local',
@@ -21,7 +21,7 @@ class Form extends Component
     protected array $attributes = [];
     protected array $data = [];
 
-    public function render()
+    public function render(): ?string
     {
         return $this->_render();
     }

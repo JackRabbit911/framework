@@ -3,6 +3,7 @@
 namespace Sys\Template;
 
 use HttpSoft\Response\HtmlResponse;
+use Psr\Http\Message\ServerRequestInterface;
 
 abstract class Component
 {
@@ -27,11 +28,19 @@ abstract class Component
         return $this;
     }
 
-    protected function render(): string | null
+    public function render(?string $view = null, ?array $data = null): string | null
     {
-        if ($this->view) {
+        if (!$view) {
+            $view = $this->view;
+        }
+
+        if (!$data) {
+            $data = $this->data;
+        }
+
+        if ($view) {
             $tpl = container()->get(TemplateInterface::class);
-            return $tpl->render($this->view, $this->data);
+            return $tpl->render($view, $data);
         }
 
         return '';

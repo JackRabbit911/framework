@@ -29,7 +29,7 @@ class App
         return isset($this->objects[$key]);
     }
 
-    public function cmp($class, ...$attributes)
+    public function cmp($class, $attributes = [])
     {
         $attributes = array_merge($attributes, $this->objects);
 

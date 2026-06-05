@@ -1,118 +1,72 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Sys\Form;
 
 use Sys\Template\Component;
-use Sys\Template\ComponentForm;
+use Sys\Helper\Facade\Arr;
+use Az\Session\SessionInterface;
 
 class Form extends Component
 {
-    use ComponentForm;
-
-    protected ?string $view;
-
-    protected array $inputs = [
-        'text', 'button','checkbox', 'color','date', 'datetime-local',
-        'email', 'file', 'hidden', 'image', 'month','number','password',
-        'radio', 'range', 'reset', 'search', 'submit', 'tel', 'time',
-        'url', 'week', 'textarea', 'select',
-    ];
-
-    protected array $attributes = [];
-    protected array $data = [];
-
-    public function render(): ?string
+    public function render(array $data = [], ?array $validation_response = null): string
     {
-        return $this->_render();
+        $this->data = array_replace_recursive($this->data, $data);
+        $this->validate($validation_response);
+
+        return parent::render();
     }
 
-    public function __call($func, $arguments)
+    private function validate(?array $validationResponse = null): void
     {
-        if (in_array($func, $this->inputs)) {
-            $name = array_shift($arguments) ?? $func;
-            return $this->setInput($func, $name, $arguments[0] ?? []);
+        if (!$validationResponse) {
+            $session = container()->get(SessionInterface::class);
+            $validationResponse = $session->pull('validation');
         }
 
-        $name = array_shift($arguments) ?? '';
-        return $this->setAttr($func, $name);
-    }
-
-    public function __isset($name)
-    {
-        return (isset($this->$name) || isset($this->attributes[$name]));
-    }
-
-    public function __get($name)
-    {
-        return $this->$name ?? $this->attributes[$name] ?? null;
-    }
-
-    public function form($view)
-    {
-        $this->view = $view;
-        $this->attributes['form'] = [];
-        return $this;
-    }
-
-    public function title(?string $title = null)
-    {
-        if ($title) {
-            $this->attributes['title'] = $title;
-            return $this;
+        if ($validationResponse) {
+            foreach ($this->data as $key => &$attribute) {
+                if (is_array($attribute) && array_key_exists('name', $attribute) && isset($validationResponse[$attribute['name']])) {
+                    $attribute = $this->attributeValidation($attribute, $validationResponse[$attribute['name']]);
+                }
+            }
         }
 
-        return $this->attributes['title'];
+        $this->data = Arr::unflatten($this->data);
     }
 
-    public function set(string|array $name, $value = null)
+    private function attributeValidation(array $attribute, array $validationResponse): array
     {
-        if (is_array($name)) {
-            $this->data = array_replace($this->data, $name);
-        } else {
-            $this->data[$name] = $value;
-        }
-    }
-
-    public function group($key, $func, $name, array $attributes = [])
-    {
-        $attr['type'] = $func;
-        $attr['name'] = $name;
-        $attr = array_merge($attr, $attributes);
-        $this->attributes[$name][$key] = $attr;
-        return $this;
-    }
-
-    private function setInput(string $func, ?string $name = null, array $attributes = [])
-    {
-        $name = (($name)) ?: $func;
-        $attributes['type'] = $func;
-
-        if (!isset($attributes['name'])) {
-            $attributes['name'] = $name;
-        }
-        
-        if (!isset($attributes['label'])) {
-            $attributes['label'] = ucfirst($name);
+        if (isset($attribute['type'])) {
+            if ($attribute['type'] === 'select' && !empty($validationResponse['value'])) {
+                foreach ($attribute['options'] as &$option) {
+                    if ($option['value'] == $validationResponse['value']) {
+                        $option['selected'] = true;
+                    } else {
+                        $option['selected'] = false;
+                    }
+                }
+            } elseif ($attribute['type'] === 'checkbox' && !empty($validationResponse['value'])) {
+                if ((is_array($validationResponse['value'])
+                        && in_array($attribute['value'], $validationResponse['value']))
+                    || $this->isTrue($validationResponse['value'])
+                ) {
+                    $attribute['checked'] = true;
+                } else {
+                    $attribute['checked'] = false;
+                }
+            }
         }
 
-        $this->attributes[$name] = $attributes;
-        return $this;
-    }
+        if (array_is_list($attribute)) {
+            foreach ($attribute as &$attr) {
+                $attr = $this->attributeValidation($attr, $validationResponse);
+            }
 
-    private function setAttr($func, $value)
-    {
-        $name = array_key_last($this->attributes);
-        $this->attributes[$name][$func] = $value;
-        return $this;
-    }
+            return $attribute;
+        }
 
-    public function getData()
-    {
-        return $this->attributes;
-    }
-
-    public function isTrue($attr) {
-        $yes = ["1", "yes", "on", "true", "checked", 1];
-        return (in_array($attr, $yes) || $attr === true) ? true : false;
+        return array_replace($attribute, $validationResponse);
     }
 }

@@ -13,7 +13,7 @@ abstract class Component
 
     public function __toString(): string
     {
-        return $this->render($this->view);
+        return $this->render();
     }
 
     public function tpl(string $view): static
@@ -28,19 +28,11 @@ abstract class Component
         return $this;
     }
 
-    public function render(?string $view = null, ?array $data = null): string | null
+    public function render(array $data = []): string
     {
-        if (!$view) {
-            $view = $this->view;
-        }
-
-        if (!$data) {
-            $data = $this->data;
-        }
-
-        if ($view) {
+        if ($this->view) {
             $tpl = container()->get(TemplateInterface::class);
-            return $tpl->render($view, $data);
+            return $tpl->render($this->view, array_replace_recursive($this->data, $data));
         }
 
         return '';

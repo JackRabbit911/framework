@@ -54,7 +54,7 @@ final class I18n
     public function gettext(string $string, ?array $values = null): string
     {
         $string = $this->model->get($this->lang, $string);
-        return ($values) ? strtr($string, $values) : $string;
+        return ($values) ? vsprintf($string, $values) : $string;
     }
 
     public function getMap(array $filter, ?string $path = null)

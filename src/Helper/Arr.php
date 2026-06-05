@@ -32,13 +32,13 @@ class Arr
         return $result;
     }
 
-    public function unflatten(array $flattenedArray, string $separator = '.'): array
+    public function unflatten(array $flattenedArray, string $pattern = '[\[|\]|\.]'): array
     {
         $result = [];
 
         foreach ($flattenedArray as $key => $value) {
-            $parts = explode($separator, $key);
-            $current = &$result; // Use a reference to traverse the array
+            $parts = preg_split($pattern, $key, -1, PREG_SPLIT_NO_EMPTY);
+            $current = &$result;
 
             foreach ($parts as $part) {
                 if (!isset($current[$part]) || !is_array($current[$part])) {
@@ -46,7 +46,7 @@ class Arr
                 }
                 $current = &$current[$part];
             }
-            $current = $value; // Assign the value to the deepest level
+            $current = $value;
         }
 
         return $result;

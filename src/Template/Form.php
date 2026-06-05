@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Sys\Form;
+namespace Sys\Template;
 
 use Sys\Template\Component;
 use Sys\Helper\Facade\Arr;
 use Az\Session\SessionInterface;
 
-class Form extends Component
+abstract class Form extends Component
 {
     public function render(array $data = [], ?array $validation_response = null): string
     {

@@ -26,6 +26,7 @@ abstract class WebController extends BaseController
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $GLOBALS['request'] = $request;
         $this->tpl = container()->get(TemplateInterface::class);
         $this->app = container()->get(App::class);
 

@@ -10,16 +10,19 @@ use Az\Session\SessionInterface;
 
 abstract class Form extends Component
 {
-    public function render(array $data = [], ?array $validation_response = null): string
+    public function render(array $data = []): string
     {
         $this->data = array_replace_recursive($this->data, $data);
-        $this->validate($validation_response);
+        $this->validate();
 
         return parent::render();
     }
 
-    private function validate(?array $validationResponse = null): void
+    private function validate(): void
     {
+        $request = $GLOBALS['request'] ?? null;
+        $validationResponse = $request?->getAttribute('validation') ?? null;
+
         if (!$validationResponse) {
             $session = container()->get(SessionInterface::class);
             $validationResponse = $session->pull('validation');

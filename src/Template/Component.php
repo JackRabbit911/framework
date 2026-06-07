@@ -9,11 +9,16 @@ abstract class Component
 {
     protected ?string $view = null;
     protected array $data = [];
-    protected ?string $js = null;
 
     public function __toString(): string
     {
         return $this->render();
+    }
+
+    public function js(string $file)
+    {
+        $app = container()->get(App::class);
+        $app->js($file);
     }
 
     public function tpl(string $view): static

@@ -192,7 +192,7 @@ function call($callable, array $data = [])
 
 function is_ajax(ServerRequestInterface $request)
 {
-    $key = 'x_requested_with';
+    $key = 'X-Requested-With';
     $header = $request->getHeaderLine($key);
 
     if (empty($header)) {

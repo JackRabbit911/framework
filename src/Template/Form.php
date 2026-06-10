@@ -10,12 +10,19 @@ use Az\Session\SessionInterface;
 
 abstract class Form extends Component
 {
+    protected int $statusCode = 200;
+
     public function render(array $data = []): string
     {
         $this->data = array_replace_recursive($this->data, $data);
         $this->validate();
 
         return parent::render();
+    }
+
+    public function statusCode(): int
+    {
+        return $this->statusCode;
     }
 
     private function validate(): void
@@ -34,6 +41,8 @@ abstract class Form extends Component
                     $attribute = $this->attributeValidation($attribute, $validationResponse[$attribute['name']]);
                 }
             }
+
+            $this->statusCode = config('validation', 'status_code');
         }
 
         $this->data = Arr::unflatten($this->data);

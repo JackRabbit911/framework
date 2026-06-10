@@ -20,6 +20,9 @@ use Pecee\Pixie\QueryBuilder\IQueryBuilderHandler;
 use Az\Session\Session;
 use Az\Session\Driver;
 use Az\Session\SessionInterface;
+use Az\Validation\Response;
+use Az\Validation\Validation;
+use Az\Validation\ValidationResponseInterface;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
@@ -59,7 +62,8 @@ return [
         => new WhoopsAdapter($request, $logger, $emitter, $response_factory),
     
     PostProcessInterface::class => fn(ContainerInterface $c) => new PostProcess($c),
-    IQueryBuilderHandler::class => fn() => (new Connection('mysql', config('database', 'connect.mysql')))->getQueryBuilder(),
+    IQueryBuilderHandler::class => fn()
+        => (new Connection('mysql', config('database', 'connect.mysql')))->getQueryBuilder(),
     
     SessionInterface::class => function (ContainerInterface $c) {
         switch (env('SESSION_DRIVER')) {
@@ -76,8 +80,11 @@ return [
 
     TemplateInterface::class => fn() => (new TemplateFactory())->create(),
     I18nModelInterface::class => fn() => new I18nModelFile(findPaths('i18n')),
-
+    ValidationResponseInterface::class => fn(ContainerInterface $c) => $c->get(Response::class),
     MiddlewareResolverInterface::class => fn(ContainerInterface $c) => new MiddlewareResolver($c),
+
+    Validation::class => fn(ContainerInterface $c)
+        => new Validation($c->get(ValidationResponseInterface::class), config('validation')),
 
     UserInterface::class => User::class,
 ];

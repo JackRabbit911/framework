@@ -96,7 +96,7 @@ class App
             return;
         }
 
-        $scripts = array_map(fn($v) => '<script src="' . $v . '"></script>', array_unique($this->scripts));
+        $scripts = array_map(fn($v) => '<script type="module" src="' . $v . '"></script>', array_unique($this->scripts));
 
         return implode(PHP_EOL, $scripts);
     }

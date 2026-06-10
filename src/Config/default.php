@@ -52,6 +52,9 @@ return [
         ],
         // 'guard_agent' => true,
     ],
+    'validation' => [
+        'status_code' => 422,
+    ],
     'pipeline' => [
         RouteMatch::class,
         ControllerAttribute::class,

@@ -20,7 +20,7 @@ abstract class WebController extends BaseController
 {
     protected ?SessionInterface $session;
     protected ?TemplateInterface $tpl;
-    protected ?UserInterface $user;
+    protected object | null $user;
     protected ?I18n $i18n;
     protected App $app;
 

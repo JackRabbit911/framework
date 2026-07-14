@@ -11,22 +11,20 @@ use PDO;
 class Db extends MysqlModel implements DriverInterface
 {
     public const CREATE_TABLE_CSRF = "CREATE TABLE `csrf` (
-  `token` varchar(32) COLLATE latin1_bin NOT NULL,
+  `token` char(64) COLLATE latin1_bin NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
   `expire` datetime NOT NULL,
-  UNIQUE KEY `token_user_id_expire` (`token`,`user_id`,`expire`),
-  KEY `token` (`token`),
+  UNIQUE KEY `token` (`token`),
   KEY `user_id` (`user_id`),
   KEY `expire` (`expire`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_bin
-";
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_bin";
 
     public function validate(string $token, ?int $user_id): bool
     {
         $now = $this->qb->raw('NOW()');
 
         $table = $this->qb->table('csrf')
-            ->where('token', '=', $token)
+            ->where('token', '=', hash('sha256', $token))
             ->where('expire', '>=', $now);
 
         if ($user_id) {
@@ -38,22 +36,21 @@ class Db extends MysqlModel implements DriverInterface
         return $table->count() > 0 ?: false;
     }
 
-    public function generate(?int $user_id, int $expire): string
+    public function generate(?int $user_id, int $lifetime): string
     {
-        $this->delete(null, $user_id);
+        $salt = $_SERVER['HTTP_USER_AGENT'] ?? uniqid();
 
         while (true) {
-            $salt = $_SERVER['HTTP_USER_AGENT'] ?? uniqid();
-            $token = md5($salt . time() . bin2hex(random_bytes(12)));
+            $token = hash_hmac('sha256', bin2hex(random_bytes(16)), $salt);
 
-            $expire_string = $this->qb->query("SELECT NOW() + INTERVAL ? SECOND", [$expire])
+            $expire_string = $this->qb->query("SELECT NOW() + INTERVAL ? SECOND", [$lifetime])
                 ->setFetchMode(PDO::FETCH_COLUMN)
                 ->first();
 
             try {
                 $this->qb->table('csrf')
                     ->insert([
-                        'token' => $token,
+                        'token' => hash('sha256', $token),
                         'user_id' => $user_id,
                         'expire' => $expire_string,
                     ]);
@@ -83,7 +80,7 @@ class Db extends MysqlModel implements DriverInterface
         $table = $this->qb->table('csrf');
 
         if ($token) {
-            $table->where('token', '=', $token);
+            $table->where('token', '=', hash('sha256', $token));
         }
 
         if ($user_id) {

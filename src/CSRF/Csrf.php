@@ -26,7 +26,7 @@ class Csrf
             $lifetime = $this->lifetime;
         }
 
-        return $this->driver->generate($user_id, time() + $lifetime);
+        return $this->driver->generate($user_id, $lifetime);
     }
 
     public function send(?int $user_id, ?int $lifetime = null)
@@ -43,7 +43,7 @@ class Csrf
             'httponly' => false,
         ];
 
-        $token = $this->generate($user_id, $expire);
+        $token = $this->generate($user_id, $lifetime);
         setcookie($this->cookieName, $token, $options);
     }
 

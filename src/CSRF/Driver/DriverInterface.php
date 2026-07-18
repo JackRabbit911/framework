@@ -10,7 +10,7 @@ interface DriverInterface
 
     public function generate(?int $user_id, int $expire): string;
 
-    public function delete(?string $token, int $user_id): void;
+    public function delete(string $token): void;
 
     public function gc(): int;
 }

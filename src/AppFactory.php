@@ -24,7 +24,7 @@ class AppFactory
         $files = [
             FRAMEWORK . 'Config/container.php',
             CONFIG . 'container/common.php',
-            CONFIG . 'container/' . MODE . '.php',
+            CONFIG . 'container/' . $GLOBALS['_MODE'] . '.php',
         ];
 
         foreach ($files as $file) {
@@ -43,8 +43,8 @@ class AppFactory
             $builder->enableCompilation(STORAGE . 'cache');
         }
 
-        $GLOBALS['container'] = $builder->build();
+        $GLOBALS['_container'] = $builder->build();
 
-        return $GLOBALS['container'];
+        return $GLOBALS['_container'];
     }
 }

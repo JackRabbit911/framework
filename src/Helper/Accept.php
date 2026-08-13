@@ -1,6 +1,6 @@
 <?php
 
-namespace Az\Helper;
+namespace Sys\Helper;
 
 use Psr\Http\Message\ServerRequestInterface;
 

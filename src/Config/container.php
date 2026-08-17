@@ -1,14 +1,22 @@
 <?php
 
 use Auth\User;
+use Az\Route\Matcher;
+use Az\Route\RouteFactory;
 use HttpSoft\ServerRequest\ServerRequestCreator;
 use HttpSoft\Emitter\EmitterInterface;
 use HttpSoft\Emitter\SapiEmitter;
 use HttpSoft\Runner\MiddlewareResolverInterface;
 use HttpSoft\Runner\MiddlewareResolver;
+use HttpSoft\Message\RequestFactory;
+use HttpSoft\Message\ServerRequestFactory;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Http\Client\ClientInterface as PsrHttpClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ServerRequestFactoryInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Az\Route\Router;
 use Az\Route\RouterInterface;
 use Sys\Exception\SetErrorHandlerInterface;
@@ -23,10 +31,10 @@ use Az\Session\SessionInterface;
 use Az\Validation\Response;
 use Az\Validation\Validation;
 use Az\Validation\ValidationResponseInterface;
+use GuzzleHttp\Client as GuzzleClient;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
-use Psr\Http\Server\RequestHandlerInterface;
 use Sys\Contract\UserInterface;
 use Sys\Template\TemplateFactory;
 use Sys\Template\TemplateInterface;
@@ -40,7 +48,12 @@ use Sys\Pipeline\PostProcessInterface;
 return [
     ServerRequestInterface::class => fn() => (new ServerRequestCreator())->create(),
     RequestHandlerInterface::class => fn(ExceptionResponseFactory $factory) => new DefaultHandler($factory),
-    RouterInterface::class => fn() => new Router(ROUTE_PATHS),
+
+    RequestFactoryInterface::class => fn() => new RequestFactory,
+    ServerRequestFactoryInterface::class => fn() => new ServerRequestFactory,
+    PsrHttpClientInterface::class => DI\create(GuzzleClient::class),
+
+    RouterInterface::class => fn() => new Router(new Matcher, new RouteFactory, 'getRoutePaths'),
     PipelineInterface::class => fn(ContainerInterface $c) => new Pipeline($c),
     EmitterInterface::class => fn() => new SapiEmitter,
     LoggerInterface::class => function () {
@@ -55,11 +68,11 @@ return [
         $logger->pushHandler(new StreamHandler(STORAGE . 'logs/' . $file, $level, true, 0777));
         return $logger;
     },
-    SetErrorHandlerInterface::class => fn(ServerRequestInterface $request, 
+    SetErrorHandlerInterface::class => fn(
         LoggerInterface $logger, 
         EmitterInterface $emitter, 
         ExceptionResponseFactory $response_factory) 
-        => new WhoopsAdapter($request, $logger, $emitter, $response_factory),
+        => new WhoopsAdapter($logger, $emitter, $response_factory),
     
     PostProcessInterface::class => fn(ContainerInterface $c) => new PostProcess($c),
     IQueryBuilderHandler::class => fn()

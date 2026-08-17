@@ -30,7 +30,7 @@ final class ExceptionResponseFactory implements HttpExceptionInterface
                 return new TextResponse($text, $code);
                 break;
             case ResponseType::json:
-                $array = ['error' => ['code' => $code, 'message' => $reasonPhrase]];
+                $array = ['success' => false, 'error' => ['code' => $code, 'message' => $reasonPhrase]];
                 return (new JsonResponse($array, $code));
                 break;
             default:

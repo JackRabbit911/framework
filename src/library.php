@@ -56,8 +56,8 @@ function env(?string $key = null, $default = null)
 
 function container()
 {
-    global $container;
-    return $container;
+    global $_container;
+    return $_container;
 }
 
 function config(string $file, ?string $path = null, $default = null, $cache = null)
@@ -312,4 +312,11 @@ function referer(?ServerRequestInterface $request = null, ?string $default = '/'
     $referer = $referer !== $current_uri ? $referer : $default;
 
     return $host === $referer_host ? $referer : $default;
+}
+
+function _define(string $name, $value)
+{
+    if (!defined($name)) {
+        define($name, $value);
+    }
 }

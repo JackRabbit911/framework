@@ -6,7 +6,6 @@ use Sys\Helper\MimeNegotiator;
 use Sys\Helper\ResponseType;
 use Sys\Exception\ExceptionResponseFactory;
 use HttpSoft\Emitter\EmitterInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Whoops\Run as Whoops;
 use Whoops\Handler\PrettyPageHandler;
@@ -18,11 +17,13 @@ use Whoops\Util\Misc;
 final class WhoopsAdapter implements SetErrorHandlerInterface
 {
     public function __construct(
-        ServerRequestInterface $request,
-        LoggerInterface $logger,
+        private LoggerInterface $logger,
         private EmitterInterface $emitter,
         private ExceptionResponseFactory $responseFactory
-    ) {
+    ){}
+
+    public function setHandler($request)
+    {
         $accept_header = $request->getHeaderLine('Accept');
         $mimeNegotiator = new MimeNegotiator($accept_header);
         $response_type = $mimeNegotiator->getResponseType();
@@ -32,7 +33,7 @@ final class WhoopsAdapter implements SetErrorHandlerInterface
         if (
             Misc::isAjaxRequest()
             || $response_type === 'json'
-            || MODE === 'api'
+            || $GLOBALS['_MODE'] === 'api'
         ) {
             $handler = new JsonResponseHandler;
         } elseif (
@@ -57,7 +58,7 @@ final class WhoopsAdapter implements SetErrorHandlerInterface
             }
         }
 
-        $this->pushLogHandler($whoops, $logger);
+        $this->pushLogHandler($whoops, $this->logger);
 
         $whoops->register();
     }

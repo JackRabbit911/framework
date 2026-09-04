@@ -57,7 +57,7 @@ class TemplateFactory
         }));
 
         
-        $twig->addFunction(new TwigFunction('lucide', function (string $name, array $attributes = [], string $altText = '') {
+        $twig->addFunction(new TwigFunction('icon', function (string $name, array $attributes = [], string $altText = '') {
             $lucideManager = container()->get(IconManager::class);
             $defaultAttributes = ['aria-hidden' => 'true'];
             $finalAttributes = array_merge($defaultAttributes, $attributes);

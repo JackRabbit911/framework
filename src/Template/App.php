@@ -4,7 +4,7 @@ namespace Sys\Template;
 
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
-use Sys\Helper\Facade\Text;
+use Sys\Helper\Facade\Str;
 use Sys\SimpleRequest;
 
 class App
@@ -70,7 +70,7 @@ class App
     {
         return ($strong)
             ? $this->uri() === $string
-            : str_contains($this->uri(), Text::strToSlug($string));
+            : str_contains($this->uri(), Str::slug($string));
     }
 
     public function request()

@@ -5,6 +5,8 @@ namespace Sys\Template;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFunction;
+use Twig\Markup;
+use Lucide\IconManager;
 
 class TemplateFactory
 {
@@ -27,7 +29,7 @@ class TemplateFactory
         if (ENV > PRODUCTION) {
             $twig->addExtension(new \Twig\Extension\DebugExtension());
         }
-        
+
         $twig->addFunction(new TwigFunction('path', function ($routeName, $params = []) {
             return path($routeName, $params);
         }));
@@ -52,6 +54,15 @@ class TemplateFactory
             $type = pathinfo($path, PATHINFO_EXTENSION);
             $data = file_get_contents($path);
             return 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }));
+
+        
+        $twig->addFunction(new TwigFunction('icon', function (string $name, array $attributes = [], string $altText = '') {
+            $lucideManager = container()->get(IconManager::class);
+            $defaultAttributes = ['aria-hidden' => 'true'];
+            $finalAttributes = array_merge($defaultAttributes, $attributes);
+            $icon = $lucideManager->getIcon($name, $finalAttributes, $altText);
+            return new Markup($icon->render(), 'UTF-8');
         }));
 
         return new Template($twig, 'twig');

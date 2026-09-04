@@ -53,7 +53,7 @@ return [
     ServerRequestFactoryInterface::class => fn() => new ServerRequestFactory,
     PsrHttpClientInterface::class => DI\create(GuzzleClient::class),
 
-    RouterInterface::class => fn() => new Router(new Matcher, new RouteFactory, 'getRoutePaths'),
+    RouterInterface::class => fn() => new Router(getRoutePaths()),
     PipelineInterface::class => fn(ContainerInterface $c) => new Pipeline($c),
     EmitterInterface::class => fn() => new SapiEmitter,
     LoggerInterface::class => function () {

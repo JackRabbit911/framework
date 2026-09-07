@@ -2,11 +2,10 @@
 
 namespace Sys\Template;
 
+use Sys\Helper\Svg;
 use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 use Twig\TwigFunction;
-use Twig\Markup;
-use Lucide\IconManager;
+use Twig\Loader\FilesystemLoader;
 
 class TemplateFactory
 {
@@ -56,14 +55,13 @@ class TemplateFactory
             return 'data:image/' . $type . ';base64,' . base64_encode($data);
         }));
 
-        
-        $twig->addFunction(new TwigFunction('icon', function (string $name, array $attributes = [], string $altText = '') {
-            $lucideManager = container()->get(IconManager::class);
-            $defaultAttributes = ['aria-hidden' => 'true'];
-            $finalAttributes = array_merge($defaultAttributes, $attributes);
-            $icon = $lucideManager->getIcon($name, $finalAttributes, $altText);
-            return new Markup($icon->render(), 'UTF-8');
-        }));
+        $twig->addFunction(
+            new TwigFunction(
+                'svg',
+                [container()->get(Svg::class), 'render'],
+                ['is_safe' => ['html']]
+            )
+        );
 
         return new Template($twig, 'twig');
     }

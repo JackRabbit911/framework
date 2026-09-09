@@ -6,7 +6,9 @@ use Symfony\Component\Console\Command\Command;
 use Sys\Console\Command\Clear\Log;
 use Sys\Console\Command\Clear\Session;
 use Sys\Console\Command\Database\Migrate;
+use Sys\Console\Command\Do\Down;
 use Sys\Console\Command\Do\Unittest;
+use Sys\Console\Command\Do\Up;
 use Sys\Console\Command\Make\Controller;
 use Sys\Console\Command\Make\CRUD;
 use Sys\Console\Command\Make\Database;
@@ -35,14 +37,17 @@ return [
     'make:database' => static fn(): Command => $container->get(Database::class),
     'mk:db' => static fn(): Command => $container->get(Database::class),
 
-    'make:migration' => static fn(): Command => container()->get(Migration::class),
-    'mk:mgrt' => static fn(): Command => container()->get(Migration::class),
+    'make:migration' => static fn(): Command => $container->get(Migration::class),
+    'mk:mgrt' => static fn(): Command => $container->get(Migration::class),
 
-    'db:migrate' => static fn(): Command => container()->get(Migrate::class),
-    'db:mgrt' => static fn(): Command => container()->get(Migrate::class),
+    'db:migrate' => static fn(): Command => $container->get(Migrate::class),
+    'db:mgrt' => static fn(): Command => $container->get(Migrate::class),
 
-    'clear:sess' => static fn(): Command => container()->get(Session::class),
-    'clear:log' => static fn(): Command => container()->get(Log::class),
+    'clear:sess' => static fn(): Command => $container->get(Session::class),
+    'clear:log' => static fn(): Command => $container->get(Log::class),
 
-    'do:test' => static fn(): Command => container()->get(Unittest::class),
+    'do:test' => static fn(): Command => $container->get(Unittest::class),
+
+    'do:down' => static fn(): Command => $container->get(Down::class),
+    'do:up' => static fn(): Command => $container->get(Up::class),
 ];

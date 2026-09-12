@@ -28,14 +28,6 @@ class Down extends Command
     {
         $hours_to_wait = $input->getArgument('retry_after') ?? 2;
         self::down($hours_to_wait);
-        // $tz_name = date_default_timezone_get();
-        // $local_tz = new DateTimeZone($tz_name);
-        // $date = new DateTime('now', $local_tz);
-        // $date->modify("+$hours_to_wait hours");
-        // $date->setTimezone(new DateTimeZone('GMT'));
-        // $retry_after_gmt = $date->format('D, d M Y H:i:s \G\M\T');
-
-        // file_put_contents('./maintenance', $retry_after_gmt);
         $output->writeln('Maintenance mode is on');
 
         return Command::SUCCESS;
@@ -50,6 +42,6 @@ class Down extends Command
         $date->setTimezone(new DateTimeZone('GMT'));
         $retry_after_gmt = $date->format('D, d M Y H:i:s \G\M\T');
 
-        file_put_contents('./maintenance', $retry_after_gmt);
+        file_put_contents(STORAGE . 'maintenance', $retry_after_gmt);
     }
 }

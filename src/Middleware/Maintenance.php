@@ -31,7 +31,7 @@ class Maintenance implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $file = '../' . DOCROOT . 'maintenance';
+        $file = STORAGE . 'maintenance';
 
         if (!is_file($file)) {
             return $handler->handle($request);

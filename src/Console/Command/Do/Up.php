@@ -31,6 +31,10 @@ class Up extends Command
 
     public static function up()
     {
-        unlink('./maintenance');
+        $file = STORAGE . 'maintenance';
+
+        if (is_file($file)) {
+            unlink($file);
+        }
     }
 }

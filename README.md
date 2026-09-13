@@ -4,7 +4,7 @@ Simple lightweight modern component psr compatible PHP framework
 `composer require alpha-zeta/framework`
 ## Features
 - PHP 8.2
-- Dependency injection amd container
+- Dependency injection and container
 - Pipeline and middlewares
 - Fast and powerful routing
 - Jobs, queues and tasks

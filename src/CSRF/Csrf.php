@@ -66,4 +66,9 @@ class Csrf
     {
         return $this->headerName;
     }
+
+    public function getExpired()
+    {
+        return $this->driver->getExpired();
+    }
 }

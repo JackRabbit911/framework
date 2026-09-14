@@ -14,14 +14,19 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'clear:log')]
 class Log extends Command
 {
-    private string $dir = 'storage/logs/';
+    private static string $dir = STORAGE . 'logs/';
 
     protected function configure(): void
     {
         $this
             ->setDescription('Clear log files')
             ->setHelp('This command clear log files...')
-            ->addArgument('name', InputArgument::OPTIONAL, 'log file name')
+            ->addArgument(
+                'names',
+                InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
+                'filenames separated by spaces, without extensions',
+                ['error.log']
+            )
         ;
     }
 
@@ -29,16 +34,50 @@ class Log extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $file = $input->getArgument('name') ?? 'error.log';
-        $file = $this->dir . $file;
+        $filenames = $input->getArgument('names');
 
-        if (!is_file($file)) {
-            $io->error("$file is not found");
-        } else {
-            file_put_contents($file, '');
-            $io->success("The file $file was successfully cleared.");
+        [$success, $error] = self::clear($filenames);
+
+        if ($success) {
+            $io->success($success);
+        }
+
+        if ($error) {
+            $io->warning($error);
         }
 
         return Command::SUCCESS;
+    }
+
+    public static function clear(?array $names = null)
+    {
+        if (!$names) {
+            $names = ['error.log'];
+        }
+
+        foreach ($names as $name) {
+            $file = self::$dir . $name;
+    
+            if (!is_file($file)) {
+                $not_found[] = $name;
+            } else {
+                file_put_contents($file, '');
+                $found[] = $name;
+            }
+        }
+
+        $success = $error = null;
+
+        if (isset($found)) {
+            $found_str = implode(', ', $found);
+            $success = count($found) . ' files was successfully cleared (' . $found_str . ')';
+        }
+
+        if (isset($not_found)) {
+            $not_found_str = implode(', ', $not_found);
+            $error = count($not_found) . ' files is not found (' . $not_found_str . ')';
+        }
+
+        return [$success, $error];
     }
 }

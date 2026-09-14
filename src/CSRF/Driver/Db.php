@@ -119,4 +119,13 @@ class Db extends MysqlModel implements DriverInterface
             ->where('user_agent', '!=', $this->user_agent)
             ->delete();
     }
+
+    public function getExpired()
+    {
+        $now = $this->qb->raw('NOW()');
+
+        return $this->qb->table('csrf')
+            ->where('expire', '<', $now)
+            ->count();
+    }
 }

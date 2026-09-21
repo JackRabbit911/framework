@@ -69,9 +69,12 @@ final class I18n
 
     public function path(string $path): string
     {
-        if (!$this->needInsertSegment) {
+        if ($this->redirect === Redirect::Lang2empty && $this->lang === $this->baseLang()) {
             return $path;
         }
+        // if (!$this->needInsertSegment) {
+        //     return $path;
+        // }
 
         return $this->insertSegmentToPath($path, $this->lang);
     }
@@ -129,9 +132,13 @@ final class I18n
     public function insertSegmentToPath(string $path, string $lang): string
     {
         $arr = explode('/', trim($path, '/'));
-        $arr[$this->index] = $lang;
 
-        return '/' . rtrim(implode('/', $arr), '/');
+        if (in_array($arr[$this->index], array_keys($this->langs))) {
+            $arr[$this->index] = $lang;
+        } else array_unshift($arr, $lang);
+
+
+        return '/' . trim(implode('/', $arr), '/');
     }
 
     private function getLangLink($path, $lang)

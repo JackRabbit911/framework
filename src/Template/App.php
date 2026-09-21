@@ -70,7 +70,7 @@ class App
     {
         return ($strong)
             ? $this->uri() === $string
-            : str_contains($this->uri(), Str::slug($string));
+            : str_contains($this->uri(), $string);// Str::slug($string));
     }
 
     public function request()

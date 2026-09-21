@@ -72,6 +72,11 @@ final class I18n
         if ($this->redirect === Redirect::Lang2empty && $this->lang === $this->baseLang()) {
             return $path;
         }
+
+        if ($this->detectionMethod !== DetectionMethod::Segment) {
+            return $path;
+        }
+
         // if (!$this->needInsertSegment) {
         //     return $path;
         // }

@@ -13,7 +13,8 @@ class DefaultHandler implements RequestHandlerInterface
 {
     public function __construct(
         private ExceptionResponseFactory $factory,
-        private ?ResponseType $responseType = null){}
+        private ?ResponseType $responseType = null
+    ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -22,9 +23,18 @@ class DefaultHandler implements RequestHandlerInterface
         $accept_header = $request->getHeaderLine('Accept');
 
         if (!$this->responseType) {
-            $mimeNegotiator = new MimeNegotiator($accept_header);
-            $response_type = $mimeNegotiator->getResponseType();
-            $response_type = ResponseType::from($response_type);
+            switch (MODE) {
+                case 'api':
+                    $response_type = ResponseType::json;
+                    break;
+                case 'cli':
+                    $response_type = ResponseType::text;
+                    break;
+                default:
+                    $mimeNegotiator = new MimeNegotiator($accept_header);
+                    $response_type = $mimeNegotiator->getResponseType();
+                    $response_type = ResponseType::from($response_type);
+            }
         } else {
             $response_type = $this->responseType;
         }

@@ -6,7 +6,7 @@ namespace Sys\Helper;
 
 class Svg
 {
-    private string $iconsPath = DOCROOT . 'assets/icons/';
+    private string $iconsPath = './assets/icons/';
     private array $filesCache = [];
     private array $defaultAttributes = [];
 
@@ -14,6 +14,11 @@ class Svg
     {
         $defaultAttributes = config('svg_defaults') ?? [];
         $this->defaultAttributes = array_replace($defaultAttributes, $attributes);
+
+        if (isset($this->defaultAttributes['icon_path'])) {
+            $this->iconsPath = $this->defaultAttributes['icon_path'];
+            unset($this->defaultAttributes['icon_path']);
+        }
     }
 
     public function render(string $name, array $attributes = []): string
@@ -38,7 +43,7 @@ class Svg
         $cacheKey = $name . ($shouldClean ? '_cleaned' : '_raw');
 
         if (!isset($this->filesCache[$cacheKey])) {
-            $filePath = $this->iconsPath . $name;
+            $filePath = is_file($name) ? $name : $this->iconsPath . $name;
 
             if (!file_exists($filePath)) {
                 return "<!-- Icon '$name' not found -->";

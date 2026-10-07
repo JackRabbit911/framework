@@ -43,7 +43,7 @@ class Maintenance implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $html = file_get_contents(DOCROOT . 'maintenance.html');
+        $html = file_get_contents('./maintenance.html');
         $retry = file_get_contents($file);
 
         $headers = [

@@ -9,6 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use InvalidArgumentException;
 
 class Pipeline implements PipelineInterface
 {
@@ -18,11 +19,19 @@ class Pipeline implements PipelineInterface
 
     public function pipe(string|object|array $middleware, ?string $prefix = null): void
     {
-        if (is_string($middleware)) {
-            $middleware = $this->container->get($middleware);
+        if (is_array($middleware)) {
+            foreach ($middleware as $m) {
+                $this->pipe($m, $prefix);
+            }
+            return;
         }
 
-        $this->pipeline[] = (!$prefix || $prefix === '/') ? $middleware : $this->path($prefix, $middleware);
+        $item = [
+            'middleware' => $middleware,
+            'prefix' => $prefix ? '/' . trim($prefix, '/') : null
+        ];
+
+        $this->pipeline[] = $item;
     }
 
     public function process(
@@ -34,48 +43,45 @@ class Pipeline implements PipelineInterface
 
     private function next($handler)
     {
-        return new class($this->pipeline, $handler) implements RequestHandlerInterface {
+        return new class($this->pipeline, $handler, $this->container) implements RequestHandlerInterface {
 
-            public function __construct(private $pipeline, private $handler) {}
+            public function __construct(
+                private array $pipeline, 
+                private $handler,
+                private ContainerInterface $container
+            ) {}
 
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
-                if (!$middleware = array_shift($this->pipeline)) {
+                if (!$item = array_shift($this->pipeline)) {
                     return $this->handler->handle($request);
                 }
 
-                $next = clone $this;
+                $middleware = $item['middleware'];
+                $prefix = $item['prefix'];
 
-                return $middleware->process($request, $next);
-            }
-        };
-    }
-
-    private function path(string $prefix, MiddlewareInterface $middleware): MiddlewareInterface
-    {
-        $middleware = is_string($middleware) ? $this->container->get($middleware) : $middleware;
-
-        return new class($prefix, $middleware) implements MiddlewareInterface {
-            public function __construct(private string $prefix, private MiddlewareInterface $middleware) {}
-
-            public function process(
-                ServerRequestInterface $request,
-                RequestHandlerInterface $handler
-            ): ResponseInterface {
-                $this->prefix = $this->normalize($this->prefix);
-                $path = $this->normalize($request->getUri()->getPath());
-
-                if ($this->prefix === '/' || stripos($path, $this->prefix) === 0) {
-                    return $this->middleware->process($request, $handler);
+                if (is_string($middleware)) {
+                    $middleware = $this->container->get($middleware);
                 }
 
-                return $handler->handle($request);
-            }
+                if (!$middleware instanceof MiddlewareInterface) {
+                    throw new InvalidArgumentException("The object must implement MiddlewareInterface");
+                }
 
-            private function normalize(string $path): string
-            {
-                $path = '/' . trim($path, '/');
-                return ($path === '/') ? '/' : $path . '/';
+                if ($prefix && $prefix !== '/') {
+                    $path = '/' . trim($request->getUri()->getPath(), '/');
+                    
+                    // Проверяем строгое совпадение ИЛИ совпадение по сегменту папки (/admin/...)
+                    $isMatch = ($path === $prefix) || (str_starts_with($path, $prefix . '/'));
+
+                    if (!$isMatch) {
+                        $next = clone $this;
+                        return $next->handle($request);
+                    }
+                }
+
+                $next = clone $this;
+                return $middleware->process($request, $next);
             }
         };
     }

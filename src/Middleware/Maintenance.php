@@ -13,6 +13,7 @@ use Psr\Http\Server\RequestHandlerInterface as Handler;
 class Maintenance implements MiddlewareInterface
 {
     private array $exclude_urls = [];
+    private string $file = STORAGE . 'maintenance';
 
     public function __construct(?array $exclude_urls = null)
     {
@@ -27,13 +28,14 @@ class Maintenance implements MiddlewareInterface
     {
         $path = $request->getUri()->getPath();
 
-        if ($this->isExclude($path)) {
+        if (!is_file($this->file) || $this->isExclude($path)) {
             return $handler->handle($request);
         }
 
-        $file = STORAGE . 'maintenance';
+        $expire = file_get_contents($this->file);
 
-        if (!is_file($file)) {
+        if (time() > strtotime($expire)) {
+            unlink($this->file);
             return $handler->handle($request);
         }
 
@@ -44,10 +46,9 @@ class Maintenance implements MiddlewareInterface
         }
 
         $html = file_get_contents('./maintenance.html');
-        $retry = file_get_contents($file);
 
         $headers = [
-            'Retry-After' => $retry,
+            'Retry-After' => $expire,
         ];
 
         return new HtmlResponse($html, 503, $headers);

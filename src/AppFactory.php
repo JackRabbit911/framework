@@ -5,21 +5,32 @@ declare(strict_types=1);
 namespace Sys;
 
 use Sys\Console\App as Console;
-use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
+use Sys\Container\AppContainerInterface;
+use Sys\Container\ContainerBuilderInterface;
+use Sys\Container\ContainerBuildException;
+use Sys\Container\PhpDiContainerBuilder;
 
 class AppFactory
 {
-    public static function create(): App
+    private ContainerBuilderInterface $builder;
+
+    public function __construct(?ContainerBuilderInterface $builder = null)
     {
-        $container = self::getContainer();
+        $this->builder = $builder ?? new PhpDiContainerBuilder();
+    }
+
+    public function create(): App
+    {
+        $container = $this->getContainer();
         return $container->get(App::class);
     }
 
-    public static function getContainer(): ContainerInterface
+    private function getContainer(): AppContainerInterface
     {
-        $builder = new ContainerBuilder();
-        $builder->useAttributes(true);
+        if (isset($GLOBALS['_container'])) {
+            return $GLOBALS['_container'];
+        }
 
         $files = [
             FRAMEWORK . 'Config/container.php',
@@ -27,24 +38,13 @@ class AppFactory
             CONFIG . 'container/' . $GLOBALS['_MODE'] . '.php',
         ];
 
-        foreach ($files as $file) {
-            if (is_file($file)) {
-                $builder->addDefinitions($file);
-            }
-        }
-
-        if (IS_CACHE) {
-            $autowire_config = CONFIG . 'container/autowire.php';
-
-            if (is_file($autowire_config)) {
-                $builder->addDefinitions(CONFIG . 'container/autowire.php');
-            }
+        try {
+            $wrappedContainer = $this->builder->build($files, IS_CACHE, STORAGE . 'cache');
+            $GLOBALS['_container'] = $wrappedContainer;
             
-            $builder->enableCompilation(STORAGE . 'cache');
+            return $GLOBALS['_container'];
+        } catch (Throwable $e) {
+            throw ContainerBuildException::fromThrowable($e);
         }
-
-        $GLOBALS['_container'] = $builder->build();
-
-        return $GLOBALS['_container'];
     }
 }

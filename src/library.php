@@ -54,6 +54,9 @@ function env(?string $key = null, $default = null)
     return ($key) ? $entry : $entries;
 }
 
+/**
+ * @return \Sys\Container\AppContainerInterface
+ */
 function container()
 {
     global $_container;

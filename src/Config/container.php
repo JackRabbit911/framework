@@ -35,7 +35,10 @@ use GuzzleHttp\Client as GuzzleClient;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
+use Sys\Container\AppContainerInterface;
+use Sys\Container\PhpDiAdapter;
 use Sys\Contract\UserInterface;
+use Sys\Database\LazyQueryBuilder;
 use Sys\Template\TemplateFactory;
 use Sys\Template\TemplateInterface;
 use Sys\I18n\Model\File as I18nModelFile;
@@ -46,6 +49,10 @@ use Sys\Pipeline\PostProcess;
 use Sys\Pipeline\PostProcessInterface;
 
 return [
+    AppContainerInterface::class => function (ContainerInterface $c) {
+        return new PhpDiAdapter($c);
+    },
+    ContainerInterface::class => fn(AppContainerInterface $c) => $c,
     ServerRequestInterface::class => fn() => (new ServerRequestCreator())->create(),
     RequestHandlerInterface::class => fn(ExceptionResponseFactory $factory) => new DefaultHandler($factory),
 
@@ -75,6 +82,7 @@ return [
         => new WhoopsAdapter($logger, $emitter, $response_factory),
     
     PostProcessInterface::class => fn(ContainerInterface $c) => new PostProcess($c),
+
     IQueryBuilderHandler::class => fn()
         => (new Connection('mysql', config('database', 'connect.mysql')))->getQueryBuilder(),
     

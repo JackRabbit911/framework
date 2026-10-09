@@ -9,7 +9,7 @@ use Psr\Container\ContainerInterface;
 use Sys\Container\AppContainerInterface;
 use Sys\Container\ContainerBuilderInterface;
 use Sys\Container\ContainerBuildException;
-use Sys\Container\PhpDiContainerBuilder;
+use Sys\Container\PhpDi\PhpDiContainerBuilder;
 
 class AppFactory
 {

@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Sys\PhpDi\Container;
+namespace Sys\Container\PhpDi;
 
+use Sys\Container\ContainerBuilderInterface;
+use Sys\Container\AppContainerInterface;
 use DI\ContainerBuilder as PhpDiBuilder;
 
 class PhpDiContainerBuilder implements ContainerBuilderInterface

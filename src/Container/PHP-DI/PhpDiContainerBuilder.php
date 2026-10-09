@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Sys\Container;
+namespace Sys\PhpDi\Container;
 
 use DI\ContainerBuilder as PhpDiBuilder;
 

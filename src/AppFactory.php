@@ -26,7 +26,7 @@ class AppFactory
         return $container->get(App::class);
     }
 
-    private function getContainer(): AppContainerInterface
+    public function getContainer(): AppContainerInterface
     {
         if (isset($GLOBALS['_container'])) {
             return $GLOBALS['_container'];

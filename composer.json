@@ -10,8 +10,6 @@
         }
     ],
     "require": {
-        "alpha-zeta/session": "^1.0",
-        "alpha-zeta/validation": "^1.0",
         "php-di/php-di": "^7.0",
         "monolog/monolog": "^3.3",
         "httpsoft/http-message": "^1.0",
@@ -38,6 +36,8 @@
     "autoload": {
         "psr-4": {
             "Az\\Route\\": "src/Route/",
+            "Az\\Session\\": "src/Session/",
+            "Az\\Validation\\": "src/Validation",
             "Sys\\": "src/"
         }
     },

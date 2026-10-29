@@ -34,7 +34,8 @@ class Unittest extends Command
             return Command::SUCCESS;
         }
 
-        passthru(SYSPATH . 'vendor/phpunit/phpunit/phpunit ' . $test_path);
+        chdir(SYSPATH);
+        passthru('vendor/bin/phpunit ' . $test_path);
         return Command::SUCCESS;
     }
 }

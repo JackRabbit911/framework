@@ -15,8 +15,8 @@ class PostProcessTest extends TestCase
 {
     public function testPostProcess()
     {
-        define('DOCROOT', './public/');
-        define('APPPATH', '../burime/');
+        define('DOCROOT', 'public/');
+        define('APPPATH', 'application/');
         require_once APPPATH . 'common/config/bootstrap.php';
 
         $config = $this->createStub(Config::class);

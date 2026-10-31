@@ -11,7 +11,7 @@ class Arr
         $result = [];
 
         foreach ($array as $key => $value) {
-            $newKey = $prefix === '' ? $key : $prefix . '.' . $key;
+            $newKey = $prefix === '' ? (string) $key : $prefix . $separator . (string) $key;
             if (is_array($value)) {
                 if (array_is_list($value)) {
                     foreach ($value as $item) {
@@ -52,7 +52,7 @@ class Arr
         return $result;
     }
 
-    public function preparePost($array)
+    public function preparePost($array): array
     {
         array_walk_recursive($array, function (&$value) {
             if (is_string($value)) {

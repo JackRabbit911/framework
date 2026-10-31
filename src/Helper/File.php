@@ -2,8 +2,12 @@
 
 namespace Sys\Helper;
 
+use TypeError;
+
 class File
 {
+    private static ?array $extByMimeCache = null;
+
     private array $mimes = [
         '323'      => ['text/h323'],
         '7z'       => ['application/x-7z-compressed'],
@@ -226,7 +230,7 @@ class File
         'zip'      => ['application/x-zip', 'application/zip', 'application/x-zip-compressed'],
     ];
 
-    public function mime($filename)
+    public function mime(string $filename): string
     {
         $filename = realpath($filename);
 
@@ -244,20 +248,26 @@ class File
 			return mime_content_type($filename);
 		}
 
-		if ( ! empty($extension))
+		if (!empty($extension))
 		{
-			return implode(', ', $this->mimeByExt($extension));
+			return $this->mimeByExt($extension);
 		}
 
         return false;
     }
 
-    public function mimeByExt($extension)
+    public function mimeByExt(string $extension): string
     {
-        return $this->mimes[$extension];
+        $key = strtolower($extension);
+
+        if (!isset($this->mimes[$key])) {
+            throw new TypeError('Unknown extension: ' . $extension);
+        }
+
+        return $this->mimes[$key][0];
     }
 
-    public function extByImageType($mime, $dot = true)
+    public function extByImageType(string $mime, bool $dot = true): string
     {
         $mimes = [
             'image/jpeg' => 'jpg',
@@ -273,5 +283,67 @@ class File
         }
 
         return ($dot) ? '.' . $ext : $ext;
+    }
+
+    public function extByType(string $mime): string
+    {
+        if (self::$extByMimeCache === null) {
+            self::$extByMimeCache = [
+                // images
+                'image/jpeg' => 'jpg',
+                'image/png'  => 'png',
+                'image/gif'  => 'gif',
+                'image/webp' => 'webp',
+                'image/svg+xml' => 'svg',
+                'image/bmp'  => 'bmp',
+                'image/tiff' => 'tiff',
+                'image/x-icon' => 'ico',
+
+                // documents
+                'application/pdf' => 'pdf',
+                'application/msword' => 'doc',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+                'application/vnd.ms-excel' => 'xls',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
+                'application/vnd.ms-powerpoint' => 'ppt',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation' => 'pptx',
+
+                // archives
+                'application/zip' => 'zip',
+                'application/x-zip-compressed' => 'zip',
+                'application/x-7z-compressed' => '7z',
+                'application/gzip' => 'gz',
+                'application/x-gzip' => 'gz',
+                'application/x-tar' => 'tar',
+                'application/x-rar-compressed' => 'rar',
+
+                // audio
+                'audio/mpeg' => 'mp3',
+                'audio/wav' => 'wav',
+                'audio/ogg' => 'ogg',
+                'audio/flac' => 'flac',
+
+                // video
+                'video/mp4' => 'mp4',
+                'video/x-msvideo' => 'avi',
+                'video/x-ms-wmv' => 'wmv',
+                'video/x-matroska' => 'mkv',
+                'video/webm' => 'webm',
+                'video/quicktime' => 'mov',
+
+                // text/code
+                'text/html' => 'html',
+                'text/css' => 'css',
+                'text/csv' => 'csv',
+                'text/plain' => 'txt',
+                'text/xml' => 'xml',
+                'application/javascript' => 'js',
+                'application/json' => 'json',
+                'application/xhtml+xml' => 'xhtml',
+                'application/xml' => 'xml',
+            ];
+        }
+
+        return self::$extByMimeCache[strtolower($mime)] ?? '';
     }
 }

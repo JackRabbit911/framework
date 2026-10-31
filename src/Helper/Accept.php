@@ -15,12 +15,12 @@ class Accept
         $this->request = $request;
     }
 
-    public function type($part = null)
+    public function type($part = null): float | array
     {
         return $this->accept('Accept', $part);
     }
 
-    public function isPreferredTypeJson()
+    public function isPreferredTypeJson(): bool
     {
         $types = $this->type();
 
@@ -30,17 +30,17 @@ class Accept
         return ($json > $html);
     }
 
-    public function encoding($part = null)
+    public function encoding($part = null): float | array
     {
         return $this->accept('Accept-Encoding', $part);
     }
 
-    public function charset($part = null)
+    public function charset($part = null): float | array
     {
         return $this->accept('Accept-Charset', $part);
     }
 
-    public function quality(string $header)
+    public function quality(string $header): array
     {
         $parsed = array();
 
@@ -55,7 +55,7 @@ class Accept
             $pattern = '~\b(\;\s*+)?q\s*+=\s*+([.0-9]+)~';
 
             // If there is no quality directive, return default
-            if ( ! preg_match($pattern, $value, $quality))
+            if (!preg_match($pattern, $value, $quality))
             {
                 $parsed[$value] = (float) self::DEFAULT_QUALITY;
             }
@@ -76,7 +76,7 @@ class Accept
         return $parsed;
     }
 
-    private function accept(string $headerKey, ?string $part = null): float|array
+    private function accept(string $headerKey, ?string $part = null): float | array
     {
         $headerValue = $this->request->getHeaderLine($headerKey);
         $arrayAccept = $this->quality($headerValue);

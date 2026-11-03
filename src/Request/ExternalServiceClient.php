@@ -13,13 +13,10 @@ use HttpSoft\Response\TextResponse;
 use HttpSoft\Response\XmlResponse;
 use Throwable;
 use Closure;
+use Exception;
 
-class ExternalServiceClient implements ServiceClientInterface
+class ExternalServiceClient extends ServiceClient//implements ServiceClientInterface
 {
-    public $formatSuccess = null;
-    public $formatError = null;
-
-    private string $method = 'GET';
     private array $options = [
         'headers' => [
             'Accept' => 'application/json',
@@ -28,43 +25,26 @@ class ExternalServiceClient implements ServiceClientInterface
 
     public function __construct(
         private PsrHttpClientInterface $client,
-        private string $url,
-    ) {}
+        private ?string $url,
+    )
+    {
+        if ($url) {
+            $this->url($url);
+        }
+    }
 
     public function url(string $url): self
     {
-        $this->url = $url;
-        return $this;
-    }
-
-    public function method(string $method): self
-    {
-        $this->method = $method;
-        return $this;
-    }
-
-    public function headers(array $headers): self
-    {
-        $this->options['headers'] = array_replace($this->options['headers'], $headers);
-        return $this;
-    }
-
-    public function cookies(array $cookies): self
-    {
-        foreach ($cookies as $name => $value) {
-            $this->options['headers']['Cookie'][] = $name . '=' . $value;
-        }
-        return $this;
-    }
-
-    public function query(object|array|string $query): self
-    {
-        $this->options['query'] = $query;
+        $this->url = absoluteUrl($url);
         return $this;
     }
 
     public function send(): ResponseInterface
     {
+        if (!$this->url) {
+            throw new Exception('Property $url is not defined');
+        }
+
         try {
             $response = $this->client->request($this->method, $this->url, $this->options);
             return $this->formatSuccess ? ($this->formatSuccess)($response) : $response;
@@ -74,11 +54,7 @@ class ExternalServiceClient implements ServiceClientInterface
             }
             
             return match ($this->options['headers']['Accept']) {
-                // 'application/json' => new JsonResponse($this->defaultErrorFormat($e), $e->getCode()),
-                'application/json' => new JsonResponse([
-                    'code' => $e->getCode(),
-                    'message' => $e->getMessage()
-                ], $e->getCode()),
+                'application/json' => new JsonResponse($this->defaultErrorFormat($e), 500),
                 'text/html' => throw $e,
                 'text/plain' => new TextResponse('error: ' . $e->getCode() . ' ' . $e->getMessage(), $e->getCode()),
                 'application/xml' => new XmlResponse($e->getMessage(), $e->getCode()),
@@ -93,22 +69,10 @@ class ExternalServiceClient implements ServiceClientInterface
         return $this->client->requestAsync($this->method, $this->url, $this->options);
     }
 
-    public function formatSuccess(Closure $callback): self
-    {
-        $this->formatSuccess = $callback;
-        return $this;
-    }
-
-    public function formatError(Closure $callback): self
-    {
-        $this->formatError = $callback;
-        return $this;
-    }
-
     protected function defaultErrorFormat(Throwable $e): array
     {
         $response = $e->getResponse();
-        $body = $response->getBody()->getcontents();
+        $body = $response->getBody()->getContents();
         return json_decode($body, true);
     }
 }

@@ -15,50 +15,23 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Closure;
 use Throwable;
 
-class InternalServiceClient implements ServiceClientInterface
+class InternalServiceClient extends ServiceClient
 {
-    public $formatSuccess = null;
-    public $formatError = null;
-
     private ServerRequestInterface $request;
-    private string $method = 'GET';
-    private array $headers = [];
-    private array $cookies = [];
-    private array|object|string $query;
 
     public function __construct(
         private App $app,
         private ServerRequestFactoryInterface $serverRequestFactory,
-        private string $url,
-    ) {}
+        private ?string $url,
+    ) {
+        if ($url) {
+            $this->url($url);
+        }
+    }
 
     public function url(string $url): self
     {
-        $this->url = $url;
-        return $this;
-    }
-
-    public function method(string $method): self
-    {
-        $this->method = $method;
-        return $this;
-    }
-
-    public function headers(array $headers): self
-    {
-        $this->headers = $headers;
-        return $this;
-    }
-
-    public function cookies(array $cookie): self
-    {
-        $this->cookies = $cookie;
-        return $this;
-    }
-
-    public function query(array|object|string $query): self
-    {
-        $this->query = $query;
+        $this->url = relativeUrl($url);
         return $this;
     }
 
@@ -96,18 +69,6 @@ class InternalServiceClient implements ServiceClientInterface
             throw $e;
         }
 
-    }
-
-    public function formatSuccess(Closure $callback): self
-    {
-        $this->formatSuccess = $callback;
-        return $this;
-    }
-
-    public function formatError(?Closure $callback = null): self
-    {
-        $this->formatError = $callback;
-        return $this;
     }
 
     public function getServerRequest(): ServerRequestInterface

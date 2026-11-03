@@ -18,6 +18,16 @@ class Http
         return container()->make(ExternalServiceClient::class, ['url' => $url]);
     }
 
+    public static function internal(string $url = ''): ServiceClientInterface
+    {
+        return container()->make(InternalServiceClient::class, ['url' => $url]);
+    }
+
+    public static function external(?string $url = null): ServiceClientInterface
+    {
+        return container()->make(ExternalServiceClient::class, ['url' => $url]);
+    }
+
     public static function pool($callback)
     {
         $pool = new HttpPool();

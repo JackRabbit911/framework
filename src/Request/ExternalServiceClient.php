@@ -15,13 +15,9 @@ use Throwable;
 use Closure;
 use Exception;
 
-class ExternalServiceClient extends ServiceClient//implements ServiceClientInterface
+class ExternalServiceClient extends ServiceClient
 {
-    private array $options = [
-        'headers' => [
-            'Accept' => 'application/json',
-        ],
-    ];
+    private array $options = [];
 
     public function __construct(
         private PsrHttpClientInterface $client,
@@ -44,6 +40,24 @@ class ExternalServiceClient extends ServiceClient//implements ServiceClientInter
         if (!$this->url) {
             throw new Exception('Property $url is not defined');
         }
+
+        if (!empty($this->headers)) {
+            $options['headers'] = $this->headers;
+        }
+
+        if (!empty($this->query)) {
+            $options['query'] = $this->query;
+        }
+
+        if ($this->body) {
+            if (is_array($this->body)) {
+                $options['json'] = $this->body;
+            } else {
+                $options['body'] = $this->body;
+            }
+        }
+
+        $this->options = array_replace_recursive($this->options, $options);
 
         try {
             $response = $this->client->request($this->method, $this->url, $this->options);

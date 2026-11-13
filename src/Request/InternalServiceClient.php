@@ -7,11 +7,13 @@ namespace Sys\Request;
 use Sys\App;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\PromiseInterface;
+use HttpSoft\Message\StreamFactory;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\StreamInterface;
 use Closure;
 use Throwable;
 
@@ -42,8 +44,6 @@ class InternalServiceClient extends ServiceClient
             $this->url
         );
 
-        $this->request = $this->request->withHeader("Accept", 'application/json');
-
         foreach ($this->headers as $name => $value) {
             $this->request = $this->request->withHeader($name, $value);
         }
@@ -54,6 +54,19 @@ class InternalServiceClient extends ServiceClient
 
         if (!empty($this->query)) {
             $this->request = $this->request->withQueryParams($this->query);
+        }
+
+        if ($this->body) {
+            if (is_array($this->body)) {
+                $this->body = json_encode($this->body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            }
+
+            if (!$this->body instanceof StreamInterface) {
+                $factory = new StreamFactory();
+                $this->body = $factory->createStream($this->body);
+            }
+
+            $this->request = $this->request->withBody($this->body);
         }
 
         $this->request = $this->request->withAttribute('is_internal_call', true);
@@ -68,7 +81,6 @@ class InternalServiceClient extends ServiceClient
 
             throw $e;
         }
-
     }
 
     public function getServerRequest(): ServerRequestInterface

@@ -1,19 +1,22 @@
 <?php
 
 use Sys\I18n\I18n;
-use Az\Route\RouterInterface;
-use Az\Session\SessionInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Sys\Helper\ResponseType;
+use Sys\Helper\MimeNegotiator;
+use Sys\Template\TemplateInterface;
+use Sys\Exception\ExceptionResponseFactory;
 use Sys\Config\Config;
 use Sys\SimpleRequest;
+use Az\Route\RouterInterface;
+use Az\Session\SessionInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use GuzzleHttp\Psr7\Uri;
+use GuzzleHttp\Psr7\UriResolver;
 use HttpSoft\Emitter\SapiEmitter;
 use HttpSoft\Response\HtmlResponse;
 use Nette\Utils\Finder;
-use Psr\Http\Message\ResponseInterface;
-use Sys\Exception\ExceptionResponseFactory;
-use Sys\Helper\MimeNegotiator;
-use Sys\Helper\ResponseType;
-use Sys\Template\TemplateInterface;
+// use Throwable;
 
 function dd(...$values)
 {
@@ -111,7 +114,7 @@ function path($routeName, $params = [])
     $container = container();
     $router = $container->get(RouterInterface::class);
     $path = $router->path($routeName, $params);
-    
+
     if (class_exists(I18n::class, false)) {
         $i18n = $container->get(I18n::class);
         $path = $i18n->path($path);
@@ -130,6 +133,36 @@ function url($routeName = null, $params = [])
     $path = ($routeName) ? path($routeName, $params) : $uri->getPath();
 
     return $scheme . '://' . $host . $path;
+}
+
+function relativeUrl(string $url): string
+{
+    $parts = parse_url($url);
+    $path     = isset($parts['path']) ? $parts['path'] : '';
+    $query    = isset($parts['query']) ? '?' . $parts['query'] : '';
+    $fragment = isset($parts['fragment']) ? '#' . $parts['fragment'] : '';
+
+    return $path . $query . $fragment;
+}
+
+function absoluteUrl(string $url, ?string $baseUrl = null): string
+{
+    $parts = parse_url($url);
+
+    $scheme = !isset($parts['scheme']) ? null : $parts['scheme'];
+    $host = !isset($parts['host']) ? null : $parts['host'];
+
+    $path = isset($parts['path']) ? $parts['path'] : '';
+    $query = isset($parts['query']) ? '?' . $parts['query'] : '';
+    $fragment = isset($parts['fragment']) ? '#' . $parts['fragment'] : '';
+
+    $scheme = $scheme ?: env('APP_SCHEME') ?: 'http';
+    $host = $host ?: env("APP_HOST") ?: 'localhost';
+
+    $base = new Uri("$scheme://$host");
+    $rel = new Uri($path . $query . $fragment);
+
+    return (string) UriResolver::resolve($base, $rel);
 }
 
 function findPaths(array|string $pattern, $dir = APPPATH)
@@ -321,5 +354,20 @@ function _define(string $name, $value)
 {
     if (!defined($name)) {
         define($name, $value);
+    }
+}
+
+function isUnserializable(string $string): bool 
+{
+    $string = trim($string);
+    if (empty($string) || !preg_match('/^[aOisbCdR]:/', $string)) {
+        return false;
+    }
+
+    try {
+        $data = @unserialize($string, ['allowed_classes' => false]);
+        return $data !== false || $string === 'b:0;';
+    } catch (\Throwable $e) {
+        return false;
     }
 }
